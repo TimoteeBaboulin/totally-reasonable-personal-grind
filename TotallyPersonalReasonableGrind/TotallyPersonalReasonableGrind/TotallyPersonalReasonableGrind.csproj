@@ -10,4 +10,10 @@
       <PackageReference Include="Discord.Net" Version="3.18.0" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Bot\CommandDispatcher\" />
+      <Folder Include="Bot\Commands\" />
+      <Folder Include="Bot\WebServiceCommunication\" />
+    </ItemGroup>
+
 </Project>

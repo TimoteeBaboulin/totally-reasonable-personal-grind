@@ -1,3 +1,7 @@
+using Discord;
+using Discord.WebSocket;
+using TotallyPersonalReasonableGrind.Bot;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -25,5 +29,7 @@ app.MapControllerRoute(
         pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
 
+BotProgram botProgram = new BotProgram();
+botProgram.Main();
 
 app.Run();
