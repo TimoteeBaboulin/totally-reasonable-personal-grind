@@ -1,3 +1,4 @@
+using System.Net.Sockets;
 using Discord;
 using Discord.WebSocket;
 
@@ -5,8 +6,13 @@ namespace TotallyPersonalReasonableGrind.Bot;
 
 public class BotProgram
 {
-    private DiscordSocketClient m_client = new();
+    private static DiscordSocketClient m_client = new();
     private CommandDispatcher.CommandDispatcher m_commandDispatcher = new();
+
+    public static async Task<SocketApplicationCommand> CreateSlashCommand(SlashCommandProperties properties)
+    {
+        return await m_client.CreateGlobalApplicationCommandAsync(properties);
+    }
     
     public async Task OnClientReady()
     {
