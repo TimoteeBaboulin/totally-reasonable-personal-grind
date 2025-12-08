@@ -4,7 +4,10 @@ namespace TotallyPersonalReasonableGrind.Bot.Interfaces;
 
 public interface ICommand
 {
-    public static abstract SocketApplicationCommand BuildProperties();
+    public static SocketApplicationCommand BuildProperties()
+    {
+        return null;
+    }
     
     public ulong Id { get; }
     
