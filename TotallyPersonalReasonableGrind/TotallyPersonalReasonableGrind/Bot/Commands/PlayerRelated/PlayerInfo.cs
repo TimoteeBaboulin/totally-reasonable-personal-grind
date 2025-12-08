@@ -8,18 +8,14 @@ public class PlayerInfo : ICommand
 {
     public static SocketApplicationCommand BuildProperties()
     {
-        //Create Command
         SlashCommandBuilder builder = new();
         builder.WithName("playerinfo").WithDescription("Get info about you");
         
         SlashCommandProperties properties = builder.Build();
         
-        // Register the Command
-        var slashCommand = BotProgram.CreateSlashCommand(properties);
-        slashCommand.Wait();
-        var result = slashCommand.Result;
-        
-        Console.WriteLine("passed here");
+        var task = BotProgram.CreateSlashCommand(properties);
+        task.Wait();
+        var result = task.Result;
         
         return result;
     }
@@ -30,17 +26,13 @@ public class PlayerInfo : ICommand
     
     public Task<bool> OnSlashCommand(SocketSlashCommand command) {
         // Display Player Info
-        ComponentBuilder builder = new();
-        builder.WithButton("playerButton", Id + "|playerButton");
+        command.RespondAsync("Player Info");
         
-        command.RespondAsync("Player Info", components: builder.Build());
-        
-        return Task.FromResult(true);
+        return Task.FromResult(false);
     }
 
     public Task<bool> OnComponent(SocketMessageComponent component)
     {
-        component.RespondAsync("Player Info");
         return Task.FromResult(false);
     }
 }
