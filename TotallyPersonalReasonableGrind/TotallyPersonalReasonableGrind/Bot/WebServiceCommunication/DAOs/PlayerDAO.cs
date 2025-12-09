@@ -1,4 +1,5 @@
 using MySql.Data.MySqlClient;
+using TotallyPersonalReasonableGrind.Bot.WebServiceCommunication.Models;
 
 namespace TotallyPersonalReasonableGrind.Bot.WebServiceCommunication.DAOs;
 
@@ -101,6 +102,77 @@ public class PlayerDAO
             MySqlCommand cmd = connection.CreateCommand();
             cmd.CommandText = "UPDATE player SET exploration_lvl = @level WHERE name = @name";
             cmd.Parameters.AddWithValue("@level", level);
+            cmd.Parameters.AddWithValue("@name", playerName);
+            int rowsAffected = cmd.ExecuteNonQuery();
+            connection.Close();
+            return rowsAffected > 0;
+        }
+        catch
+        {
+            connection.Close();
+            return false;
+        }
+    }
+    
+    public Player? GetPlayer(string playerName)
+    {
+        try
+        {
+            connection.Open();
+            MySqlCommand cmd = connection.CreateCommand();
+            cmd.CommandText = "SELECT * FROM player WHERE name = @name";
+            cmd.Parameters.AddWithValue("@name", playerName);
+            MySqlDataReader reader = cmd.ExecuteReader();
+            if (reader.Read())
+            {
+                Player player = new Player
+                {
+                    Id = reader.GetInt32("id"),
+                    Name = reader.GetString("name"),
+                    CombatEXP = reader.GetInt32("combat_exp"),
+                    CombatLVL = reader.GetInt32("combat_lvl"),
+                    ExplorationEXP = reader.GetInt32("exploration_exp"),
+                    ExplorationLVL = reader.GetInt32("exploration_lvl")
+                };
+                connection.Close();
+                return player;
+            }
+            connection.Close();
+            return null;
+        }
+        catch
+        {
+            connection.Close();
+            return null;
+        }
+    }
+    
+    public bool PlayerExists(string playerName)
+    {
+        try
+        {
+            connection.Open();
+            MySqlCommand cmd = connection.CreateCommand();
+            cmd.CommandText = "SELECT COUNT(*) FROM player WHERE name = @name";
+            cmd.Parameters.AddWithValue("@name", playerName);
+            int count = Convert.ToInt32(cmd.ExecuteScalar());
+            connection.Close();
+            return count > 0;
+        }
+        catch
+        {
+            connection.Close();
+            return false;
+        }
+    }
+    
+    public bool DeletePlayer(string playerName)
+    {
+        try
+        {
+            connection.Open();
+            MySqlCommand cmd = connection.CreateCommand();
+            cmd.CommandText = "DELETE FROM player WHERE name = @name";
             cmd.Parameters.AddWithValue("@name", playerName);
             int rowsAffected = cmd.ExecuteNonQuery();
             connection.Close();

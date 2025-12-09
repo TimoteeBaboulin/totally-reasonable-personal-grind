@@ -1,6 +1,7 @@
 using System.Net;
 using Microsoft.AspNetCore.Mvc;
 using TotallyPersonalReasonableGrind.Bot.WebServiceCommunication.DAOs;
+using TotallyPersonalReasonableGrind.Bot.WebServiceCommunication.Models;
 
 namespace TotallyPersonalReasonableGrind.Bot.WebServiceCommunication.Controllers;
 
@@ -59,6 +60,35 @@ public class PlayerController : Controller
         _playerDAO = new PlayerDAO();
         
         return _playerDAO.UpdatePlayerExplorationStatsLevel(playerName, level)
+            ? new HttpResponseMessage(HttpStatusCode.OK)
+            : new HttpResponseMessage(HttpStatusCode.InternalServerError);
+    }
+
+    [HttpGet]
+    [Route("Player/Get/{playerName}")]
+    public Player? GetPlayer(string playerName)
+    {
+        _playerDAO = new PlayerDAO();
+        
+        return _playerDAO.GetPlayer(playerName);
+    }
+
+    [HttpGet]
+    [Route("Player/Exists/{playerName}")]
+    public bool PlayerExists(string playerName)
+    {
+        _playerDAO = new PlayerDAO();
+        
+        return _playerDAO.PlayerExists(playerName);
+    }
+
+    [HttpDelete]
+    [Route("Player/Delete/{playerName}")]
+    public HttpResponseMessage DeletePlayer(string playerName)
+    {
+        _playerDAO = new PlayerDAO();
+        
+        return _playerDAO.DeletePlayer(playerName)
             ? new HttpResponseMessage(HttpStatusCode.OK)
             : new HttpResponseMessage(HttpStatusCode.InternalServerError);
     }
