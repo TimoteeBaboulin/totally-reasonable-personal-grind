@@ -76,6 +76,26 @@ public class ItemDAO
         }
     }
     
+    public bool UpdateItemType(string itemName, ItemType itemType)
+    {
+        try
+        {
+            connection.Open();
+            MySqlCommand cmd = connection.CreateCommand();
+            cmd.CommandText = "UPDATE item SET type = @type WHERE name = @name";
+            cmd.Parameters.AddWithValue("@type", itemType.ToString());
+            cmd.Parameters.AddWithValue("@name", itemName);
+            int rowsAffected = cmd.ExecuteNonQuery();
+            connection.Close();
+            return rowsAffected > 0;
+        }
+        catch
+        {
+            connection.Close();
+            return false;
+        }
+    }
+    
     public Item? GetItem(string itemName)
     {
         try

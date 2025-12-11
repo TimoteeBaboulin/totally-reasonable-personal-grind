@@ -11,11 +11,12 @@ public class ItemController : Controller
 
     [HttpPost]
     [Route("Item/Create/{itemName}/{itemType}/{sellValue}")]
-    public HttpResponseMessage CreateItem(string itemName, ItemType itemType, int sellValue)
+    public HttpResponseMessage CreateItem(string itemName, string itemType, int sellValue)
     {
         itemDAO = new ItemDAO();
+        ItemType parsedItemType = Enum.Parse<ItemType>(itemType);
         
-        return itemDAO.CreateItem(itemName, itemType, sellValue)
+        return itemDAO.CreateItem(itemName, parsedItemType, sellValue)
             ? new HttpResponseMessage(HttpStatusCode.OK)
             : new HttpResponseMessage(HttpStatusCode.InternalServerError);
     }
@@ -38,6 +39,18 @@ public class ItemController : Controller
         itemDAO = new ItemDAO();
         
         return itemDAO.UpdateItemName(itemName, newName)
+            ? new HttpResponseMessage(HttpStatusCode.OK)
+            : new HttpResponseMessage(HttpStatusCode.InternalServerError);
+    }
+    
+    [HttpPut]
+    [Route("Item/Update/ItemType/{itemName}/{itemType}")]
+    public HttpResponseMessage UpdateItemType(string itemName, string itemType)
+    {
+        itemDAO = new ItemDAO();
+        ItemType parsedItemType = Enum.Parse<ItemType>(itemType);
+        
+        return itemDAO.UpdateItemType(itemName, parsedItemType)
             ? new HttpResponseMessage(HttpStatusCode.OK)
             : new HttpResponseMessage(HttpStatusCode.InternalServerError);
     }
