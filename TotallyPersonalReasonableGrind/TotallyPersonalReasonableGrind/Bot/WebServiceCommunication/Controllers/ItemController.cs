@@ -12,13 +12,12 @@ public class ItemController : Controller
     private ItemDAO itemDAO;
 
     [HttpPost]
-    [Route("Item/Create/{itemName}/{itemType}/{sellValue}")]
-    public HttpResponseMessage CreateItem(string itemName, string itemType, int sellValue)
+    [Route("Item/Create/{itemName}/{sellValue}")]
+    public HttpResponseMessage CreateItem(string itemName, int sellValue)
     {
         itemDAO = new ItemDAO();
-        ItemType parsedItemType = Enum.Parse<ItemType>(itemType);
         
-        return itemDAO.CreateItem(itemName, parsedItemType, sellValue)
+        return itemDAO.CreateItem(itemName, sellValue)
             ? new HttpResponseMessage(HttpStatusCode.OK)
             : new HttpResponseMessage(HttpStatusCode.InternalServerError);
     }
@@ -44,15 +43,14 @@ public class ItemController : Controller
             ? new HttpResponseMessage(HttpStatusCode.OK)
             : new HttpResponseMessage(HttpStatusCode.InternalServerError);
     }
-    
+
     [HttpPut]
-    [Route("Item/Update/ItemType/{itemName}/{itemType}")]
-    public HttpResponseMessage UpdateItemType(string itemName, string itemType)
+    [Route("Item/Update/EmojiName/{itemName}/{emojiName}")]
+    public HttpResponseMessage UpdateEmojiName(string itemName, string emojiName)
     {
         itemDAO = new ItemDAO();
-        ItemType parsedItemType = Enum.Parse<ItemType>(itemType);
         
-        return itemDAO.UpdateItemType(itemName, parsedItemType)
+        return itemDAO.UpdateItemEmojiName(itemName, emojiName)
             ? new HttpResponseMessage(HttpStatusCode.OK)
             : new HttpResponseMessage(HttpStatusCode.InternalServerError);
     }

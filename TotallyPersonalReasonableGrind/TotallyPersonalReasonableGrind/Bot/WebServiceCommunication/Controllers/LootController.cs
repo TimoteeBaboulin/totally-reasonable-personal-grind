@@ -13,15 +13,16 @@ public class LootController : Controller
     private LootDAO lootDAO;
 
     [HttpPost]
-    [Route("Loot/Create/{itemName}/{areaName}/{quantity}/{lootRarity}/{requiredLevel}")]
-    public HttpResponseMessage CreateLootEntry(string itemName, string areaName, int quantity, string lootRarity,
-        int requiredLevel)
+    [Route("Loot/Create/{itemName}/{areaName}/{quantity}/{lootType}/{lootRarity}/{requiredLevel}")]
+    public HttpResponseMessage CreateLootEntry(string itemName, string areaName, int quantity, string lootType,
+        string lootRarity, int requiredLevel)
     {
         lootDAO = new LootDAO();
 
+        LootType parsedType = Enum.Parse<LootType>(lootType);
         LootRarity parsedRarity = Enum.Parse<LootRarity>(lootRarity);
 
-        return lootDAO.CreateLootEntry(itemName, areaName, quantity, parsedRarity, requiredLevel)
+        return lootDAO.CreateLootEntry(itemName, areaName, quantity, parsedType, parsedRarity, requiredLevel)
             ? new HttpResponseMessage(HttpStatusCode.OK)
             : new HttpResponseMessage(HttpStatusCode.InternalServerError);
     }
@@ -33,6 +34,18 @@ public class LootController : Controller
         lootDAO = new LootDAO();
 
         return lootDAO.UpdateLootQuantity(itemName, areaName, quantity)
+            ? new HttpResponseMessage(HttpStatusCode.OK)
+            : new HttpResponseMessage(HttpStatusCode.InternalServerError);
+    }
+    
+    [HttpPut]
+    [Route("Loot/Update/Type/{itemName}/{areaName}/{lootType}")]
+    public HttpResponseMessage UpdateLootType(string itemName, string areaName, string lootType)
+    {
+        lootDAO = new LootDAO();
+        LootType parsedType = Enum.Parse<LootType>(lootType);
+
+        return lootDAO.UpdateLootType(itemName, areaName, parsedType)
             ? new HttpResponseMessage(HttpStatusCode.OK)
             : new HttpResponseMessage(HttpStatusCode.InternalServerError);
     }

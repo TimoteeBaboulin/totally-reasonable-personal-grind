@@ -2,18 +2,12 @@ using System.Collections.Generic;
 
 namespace TotallyPersonalReasonableGrind.Bot.WebServiceCommunication.Models;
 
-public enum ItemType
-{
-    Material,
-    Loot
-}
-
 public class Item
 {
     public int Id { get; set; }
     public string Name { get; set; }
-    public ItemType Type { get; set; }
     public int SellValue { get; set; }
+    public string EmojiName { get; set; }
     
     public static Item FromJson(string createResponse)
     {

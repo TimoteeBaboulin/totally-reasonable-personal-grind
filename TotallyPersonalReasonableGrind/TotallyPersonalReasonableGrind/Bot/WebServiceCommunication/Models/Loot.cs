@@ -11,12 +11,19 @@ public enum LootRarity
     Legendary
 }
 
+public enum LootType
+{
+    Walk,
+    Hit
+}
+
 public class Loot
 {
     public int Id { get; set; }
     public int ItemId { get; set; }
     public int AreaId { get; set; }
     public int Quantity { get; set; }
+    public LootType Type { get; set; }
     public LootRarity Rarity { get; set; }
     public int RequiredLevel { get; set; }
     

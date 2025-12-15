@@ -15,17 +15,17 @@ public class ItemDAO
         connection = new MySqlConnection(connectionString);
     }
 
-    public bool CreateItem(string itemName, ItemType itemType, int sellValue)
+    public bool CreateItem(string itemName, int sellValue)
     {
         try
         {
             connection.Open();
             MySqlCommand cmd = connection.CreateCommand();
-            cmd.CommandText = "INSERT INTO item (name, type, sell_value)" +
-                              "VALUES (@name, @type, @sellValue)";
+            cmd.CommandText = "INSERT INTO item (name, sell_value, emoji_name)" +
+                              "VALUES (@name, @sellValue, @emojiName)";
             cmd.Parameters.AddWithValue("@name", itemName);
-            cmd.Parameters.AddWithValue("@type", itemType.ToString());
             cmd.Parameters.AddWithValue("@sellValue", sellValue);
+            cmd.Parameters.AddWithValue("@emojiName", "");
             int rowsAffected = cmd.ExecuteNonQuery();
             connection.Close();
             return rowsAffected > 0;
@@ -77,14 +77,14 @@ public class ItemDAO
         }
     }
     
-    public bool UpdateItemType(string itemName, ItemType itemType)
+    public bool UpdateItemEmojiName(string itemName, string emojiName)
     {
         try
         {
             connection.Open();
             MySqlCommand cmd = connection.CreateCommand();
-            cmd.CommandText = "UPDATE item SET type = @type WHERE name = @name";
-            cmd.Parameters.AddWithValue("@type", itemType.ToString());
+            cmd.CommandText = "UPDATE item SET emoji_name = @emojiName WHERE name = @name";
+            cmd.Parameters.AddWithValue("@emojiName", emojiName);
             cmd.Parameters.AddWithValue("@name", itemName);
             int rowsAffected = cmd.ExecuteNonQuery();
             connection.Close();
@@ -112,7 +112,6 @@ public class ItemDAO
                 {
                     Id = reader.GetInt32("id"),
                     Name = reader.GetString("name"),
-                    Type = Enum.Parse<ItemType>(reader.GetString("type")),
                     SellValue = reader.GetInt32("sell_value")
                 };
                 connection.Close();

@@ -16,18 +16,19 @@ public class LootDAO
         connection = new MySqlConnection(connectionString);
     }
     
-    public bool CreateLootEntry(string itemName, string areaName, int quantity, LootRarity rarity, int requiredLevel)
+    public bool CreateLootEntry(string itemName, string areaName, int quantity, LootType lootType, LootRarity rarity, int requiredLevel)
     {
         try
         {
             connection.Open();
             MySqlCommand cmd = connection.CreateCommand();
-            cmd.CommandText = "INSERT INTO loot (item_id, area_id, quantity, rarity, required_level) " +
+            cmd.CommandText = "INSERT INTO loot (item_id, area_id, quantity, type, rarity, required_level) " +
                               "VALUES ((SELECT id FROM item WHERE name = @itemName), " +
-                              "(SELECT id FROM area WHERE name = @areaName), @quantity, @rarity, @requiredLevel)";
+                              "(SELECT id FROM area WHERE name = @areaName), @quantity, @type, @rarity, @requiredLevel)";
             cmd.Parameters.AddWithValue("@itemName", itemName);
             cmd.Parameters.AddWithValue("@areaName", areaName);
             cmd.Parameters.AddWithValue("@quantity", quantity);
+            cmd.Parameters.AddWithValue("@type", lootType.ToString());
             cmd.Parameters.AddWithValue("@rarity", rarity.ToString());
             cmd.Parameters.AddWithValue("@requiredLevel", requiredLevel);
             int rowsAffected = cmd.ExecuteNonQuery();
@@ -51,6 +52,29 @@ public class LootDAO
                               "WHERE item_id = (SELECT id FROM item WHERE name = @itemName) " +
                               "AND area_id = (SELECT id FROM area WHERE name = @areaName)";
             cmd.Parameters.AddWithValue("@quantity", quantity);
+            cmd.Parameters.AddWithValue("@itemName", itemName);
+            cmd.Parameters.AddWithValue("@areaName", areaName);
+            int rowsAffected = cmd.ExecuteNonQuery();
+            connection.Close();
+            return rowsAffected > 0;
+        }
+        catch
+        {
+            connection.Close();
+            return false;
+        }
+    }
+    
+    public bool UpdateLootType(string itemName, string areaName, LootType lootType)
+    {
+        try
+        {
+            connection.Open();
+            MySqlCommand cmd = connection.CreateCommand();
+            cmd.CommandText = "UPDATE loot SET type = @type " +
+                              "WHERE item_id = (SELECT id FROM item WHERE name = @itemName) " +
+                              "AND area_id = (SELECT id FROM area WHERE name = @areaName)";
+            cmd.Parameters.AddWithValue("@type", lootType.ToString());
             cmd.Parameters.AddWithValue("@itemName", itemName);
             cmd.Parameters.AddWithValue("@areaName", areaName);
             int rowsAffected = cmd.ExecuteNonQuery();
@@ -127,8 +151,10 @@ public class LootDAO
             if (reader.Read())
             {
                 int quantity = reader.GetInt32("quantity");
+                string lootTypeStr = reader.GetString("type");
                 string rarityStr = reader.GetString("rarity");
                 int requiredLevel = reader.GetInt32("required_level");
+                LootType type = Enum.Parse<LootType>(lootTypeStr);
                 LootRarity rarity = Enum.Parse<LootRarity>(rarityStr);
                 loot = new Loot
                 {
@@ -136,6 +162,7 @@ public class LootDAO
                     ItemId =  reader.GetInt32("item_id"),
                     AreaId =  reader.GetInt32("area_id"),
                     Quantity = quantity,
+                    Type = type,
                     Rarity = rarity,
                     RequiredLevel = requiredLevel
                 };
