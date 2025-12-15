@@ -5,23 +5,27 @@ namespace TotallyPersonalReasonableGrind.Bot.WebServiceCommunication.Access;
 
 public class InventoryAccess
 {
-    public static async Task<Inventory> GetInventoryData(string playerName)
+    public static async Task<List<Inventory>> GetInventoryData(string playerName)
     {
-        var dataJson = await HttpClient.Client.SendToWebServiceAsync($"Inventory/Get/All/{playerName}", HttpVerb.GET, null);
-        Inventory? realData = Inventory.FromJson(dataJson);
-        if (realData != null)
+        string dataJson = await HttpClient.Client.SendToWebServiceAsync($"Inventory/Get/All/{playerName}", HttpVerb.GET, null);
+        List<Inventory> inventoryList = new();
+        foreach (var inventoryJson in System.Text.Json.JsonDocument.Parse(dataJson).RootElement.EnumerateArray())
         {
-           return realData;
+            inventoryList.Add(Inventory.FromJson(inventoryJson.GetRawText()));
         }
-        throw new Exception("Failed to get inventory data.");
+
+        return inventoryList;
     }
     
-    public static async Task AddItemToInventory(string playerName, string itemName)
+    public static async Task AddItemToInventory(string playerName, string itemName, int quantity)
     {
-        var exist = await HttpClient.Client.SendToWebServiceAsync($"Inventory/Exists/{playerName}/{itemName}", HttpVerb.GET, null);
+        string exist = await HttpClient.Client.SendToWebServiceAsync($"Inventory/Exists/{playerName}/{itemName}", HttpVerb.GET, null);
         if (!bool.Parse(exist))
         {
-            await HttpClient.Client.SendToWebServiceAsync($"Inventory/Add/{playerName}/{itemName}", HttpVerb.POST, null);
+            await HttpClient.Client.SendToWebServiceAsync($"Inventory/Create/{playerName}/{itemName}", HttpVerb.POST, null);
         }
+        string inventoryQuantity = await HttpClient.Client.SendToWebServiceAsync($"Inventory/Get/Quantity/{playerName}/{itemName}", HttpVerb.GET, null);
+        int newQuantity = int.Parse(inventoryQuantity) + quantity;
+        await HttpClient.Client.SendToWebServiceAsync($"Inventory/Update/Quantity/{playerName}/{itemName}/{newQuantity}", HttpVerb.PUT, null);
     }
 }
