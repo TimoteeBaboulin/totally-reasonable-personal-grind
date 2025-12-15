@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace TotallyPersonalReasonableGrind.Bot.WebServiceCommunication.Models;
 
 public enum LootRarity

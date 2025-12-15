@@ -1,4 +1,5 @@
 using System.Net;
+using System.Net.Http;
 using Microsoft.AspNetCore.Mvc;
 using TotallyPersonalReasonableGrind.Bot.WebServiceCommunication.DAOs;
 using TotallyPersonalReasonableGrind.Bot.WebServiceCommunication.Models;
