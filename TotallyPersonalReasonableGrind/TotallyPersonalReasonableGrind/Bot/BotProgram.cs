@@ -31,7 +31,6 @@ public class BotProgram
         m_client.ButtonExecuted += m_commandDispatcher.OnComponentExecuted;
         m_client.SelectMenuExecuted += m_commandDispatcher.OnComponentExecuted;
         
-        
         await m_client.LoginAsync(TokenType.Bot, "");
         await m_client.StartAsync();
     }

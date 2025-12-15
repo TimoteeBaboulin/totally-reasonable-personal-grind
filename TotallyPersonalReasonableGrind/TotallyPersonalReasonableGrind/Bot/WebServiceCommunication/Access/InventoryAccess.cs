@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using TotallyPersonalReasonableGrind.Bot.WebServiceCommunication.Controllers;
 using TotallyPersonalReasonableGrind.Bot.WebServiceCommunication.Models;
 

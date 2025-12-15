@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using TotallyPersonalReasonableGrind.Bot.WebServiceCommunication.Models;
 
 namespace TotallyPersonalReasonableGrind.Bot.WebServiceCommunication.Access;
