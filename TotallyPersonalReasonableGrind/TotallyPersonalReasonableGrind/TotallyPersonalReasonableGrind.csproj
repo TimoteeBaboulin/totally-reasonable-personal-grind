@@ -14,4 +14,22 @@
       <Folder Include="Bot\Commands\MapRelated\" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Reference Include="MySql.Data">
+        <HintPath>MySql.Data.dll</HintPath>
+      </Reference>
+      <Reference Include="System.Configuration.ConfigurationManager">
+        <HintPath>System.Configuration.ConfigurationManager.dll</HintPath>
+      </Reference>
+      <Reference Include="System.Security.Cryptography.ProtectedData">
+        <HintPath>System.Security.Cryptography.ProtectedData.dll</HintPath>
+      </Reference>
+      <Reference Include="System.Security.Permissions">
+        <HintPath>System.Security.Permissions.dll</HintPath>
+      </Reference>
+      <Reference Include="System.Windows.Extensions">
+        <HintPath>System.Windows.Extensions.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
 </Project>
