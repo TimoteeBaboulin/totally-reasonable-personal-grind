@@ -6,7 +6,7 @@ public class Area
     public string Name { get; set; }
     public int RequiredLVL { get; set; }
     
-    public static Area FromJson(string createResponse)
+    public static Area? FromJson(string createResponse)
     {
         return Newtonsoft.Json.JsonConvert.DeserializeObject<Area>(createResponse);
     }

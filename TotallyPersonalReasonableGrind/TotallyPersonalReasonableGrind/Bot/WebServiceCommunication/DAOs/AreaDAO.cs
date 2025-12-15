@@ -74,6 +74,35 @@ public class AreaDAO
             return false;
         }
     }
+
+    public Area? GetAreaById(int areaId)
+    {
+        try
+        {
+            connection.Open();
+            MySqlCommand cmd = connection.CreateCommand();
+            cmd.CommandText = "SELECT id, name, required_level FROM area WHERE id = @id";
+            cmd.Parameters.AddWithValue("@id", areaId);
+            MySqlDataReader reader = cmd.ExecuteReader();
+            Area? area = null;
+            if (reader.Read())
+            {
+                area = new Area
+                {
+                    Id = reader.GetInt32("id"),
+                    Name = reader.GetString("name"),
+                    RequiredLVL = reader.GetInt32("required_level")
+                };
+            }
+            connection.Close();
+            return area;
+        }
+        catch
+        {
+            connection.Close();
+            return null;
+        }
+    }
     
     public Area? GetAreaByName(string areaName)
     {

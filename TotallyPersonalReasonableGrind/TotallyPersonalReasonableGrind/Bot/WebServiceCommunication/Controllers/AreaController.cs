@@ -44,7 +44,16 @@ public class AreaController : Controller
     }
     
     [HttpGet]
-    [Route("Area/Get/{areaName}")]
+    [Route("Area/GetById/{areaId}")]
+    public Area? GetAreaById(int areaId)
+    {
+        areaDAO = new AreaDAO();
+        
+        return areaDAO.GetAreaById(areaId);
+    }
+    
+    [HttpGet]
+    [Route("Area/GetbyName/{areaName}")]
     public Area? GetAreaByName(string areaName)
     {
         areaDAO = new AreaDAO();
