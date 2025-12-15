@@ -9,4 +9,9 @@ public class Player
     public int ExplorationEXP { get; set; }
     public int ExplorationLVL { get; set; }
     public int AreaId { get; set; }
+
+    public static Player FromJson(string createResponse)
+    {
+        return Newtonsoft.Json.JsonConvert.DeserializeObject<Player>(createResponse);
+    }
 }

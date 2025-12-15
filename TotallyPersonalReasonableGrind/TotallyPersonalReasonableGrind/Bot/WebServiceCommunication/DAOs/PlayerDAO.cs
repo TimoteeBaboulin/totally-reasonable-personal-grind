@@ -153,7 +153,8 @@ public class PlayerDAO
                     CombatEXP = reader.GetInt32("combat_exp"),
                     CombatLVL = reader.GetInt32("combat_lvl"),
                     ExplorationEXP = reader.GetInt32("exploration_exp"),
-                    ExplorationLVL = reader.GetInt32("exploration_lvl")
+                    ExplorationLVL = reader.GetInt32("exploration_lvl"),
+                    AreaId = reader.GetInt32("area_id")
                 };
                 connection.Close();
                 return player;
