@@ -1,6 +1,8 @@
 using Discord;
 using Discord.WebSocket;
 using TotallyPersonalReasonableGrind.Bot.Interfaces;
+using TotallyPersonalReasonableGrind.Bot.WebServiceCommunication.Access;
+using TotallyPersonalReasonableGrind.Bot.WebServiceCommunication.Models;
 
 namespace TotallyPersonalReasonableGrind.Bot.Commands.PlayerRelated;
 
@@ -21,20 +23,19 @@ public class PlayerInfo : ICommand
         
         return result;
     }
-
-    
-
     
     public Task<bool> OnSlashCommand(SocketSlashCommand command) {
+        //Get Player Info
+        Player p = PlayerAccess.GetOrCreatePlayer(command.User.GlobalName);
+        
         // Display Player Info
         EmbedBuilder embed = new();
         embed.WithTitle("Player Info");
         embed.WithAuthor(command.User.GlobalName);
-        embed.Fields.Add(new EmbedFieldBuilder().WithName("Combat Xp").WithValue("test"));
-        embed.Fields.Add(new EmbedFieldBuilder().WithName("Combat LvL").WithValue("test"));
-        embed.Fields.Add(new EmbedFieldBuilder().WithName("Exploration Xp").WithValue("test"));
-        embed.Fields.Add(new EmbedFieldBuilder().WithName("Exploration LvL").WithValue("test"));
-        embed.Fields.Add(new EmbedFieldBuilder().WithName("Current Position").WithValue("test"));
+        embed.Fields.Add(new EmbedFieldBuilder().WithName("Combat Xp").WithValue(p.CombatEXP));
+        embed.Fields.Add(new EmbedFieldBuilder().WithName("Combat LvL").WithValue(p.CombatLVL).WithIsInline(true));
+        embed.Fields.Add(new EmbedFieldBuilder().WithName("Exploration Xp").WithValue(p.ExplorationEXP));
+        embed.Fields.Add(new EmbedFieldBuilder().WithName("Exploration LvL").WithValue(p.ExplorationLVL).WithIsInline(true));
         command.RespondAsync(embed: embed.Build());
         
         return Task.FromResult(false);
