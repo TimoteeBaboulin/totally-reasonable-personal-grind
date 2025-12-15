@@ -8,4 +8,5 @@ public class Player
     public int CombatLVL { get; set; }
     public int ExplorationEXP { get; set; }
     public int ExplorationLVL { get; set; }
+    public int AreaId { get; set; }
 }
