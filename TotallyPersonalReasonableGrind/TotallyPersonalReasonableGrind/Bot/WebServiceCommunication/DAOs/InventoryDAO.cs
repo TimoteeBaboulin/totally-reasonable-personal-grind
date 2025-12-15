@@ -117,7 +117,8 @@ public class InventoryDAO
         {
             connection.Open();
             MySqlCommand cmd = connection.CreateCommand();
-            cmd.CommandText = "SELECT * FROM inventory INNER JOIN player ON inventory.player_id = player.id " +
+            cmd.CommandText = "SELECT inventory.id, inventory.player_id, inventory.item_id, inventory.quantity " +
+                              "FROM inventory INNER JOIN player ON inventory.player_id = player.id " +
                               "WHERE player.name = @playerName";
             cmd.Parameters.AddWithValue("@playerName", playerName);
             MySqlDataReader reader = cmd.ExecuteReader();

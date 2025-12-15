@@ -4,6 +4,7 @@ using Discord;
 using Discord.WebSocket;
 using TotallyPersonalReasonableGrind.Bot.Interfaces;
 using TotallyPersonalReasonableGrind.Bot.WebServiceCommunication.Access;
+using TotallyPersonalReasonableGrind.Bot.WebServiceCommunication.Models;
 
 namespace TotallyPersonalReasonableGrind.Bot.Commands.PlayerRelated;
 
@@ -33,12 +34,14 @@ public class InventoryCommand : ICommand
         // Display Inventory
         EmbedBuilder embed = new();
         embed.WithTitle("Inventory");
-        embed.WithAuthor(command.User.GlobalName);
-        for (int i = 0; i < 1; i++)
+        embed.WithAuthor(command.User.GlobalName, command.User.GetAvatarUrl());
+        foreach (var current in inv)
         {
-            embed.AddField(new EmbedFieldBuilder().WithValue("ItemName").WithIsInline(true));
-            embed.AddField(new EmbedFieldBuilder().WithValue("ItemGold").WithIsInline(true));
-            embed.AddField(new EmbedFieldBuilder().WithValue("ItemNumber").WithIsInline(true));
+            if (current.Quantity == 0) continue;
+            Item item = ItemAccess.GetItemById(current.ItemId).Result;
+            embed.AddField(new EmbedFieldBuilder().WithName("ㅤ").WithValue(item.Name).WithIsInline(true));
+            embed.AddField(new EmbedFieldBuilder().WithName("ㅤ").WithValue(item.SellValue).WithIsInline(true));
+            embed.AddField(new EmbedFieldBuilder().WithName("ㅤ").WithValue(current.Quantity).WithIsInline(true));
         }
         command.RespondAsync(embed: embed.Build());
         
