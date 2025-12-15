@@ -20,7 +20,7 @@ public class AreaDAO
         {
             connection.Open();
             MySqlCommand cmd = connection.CreateCommand();
-            cmd.CommandText = "INSERT INTO area (name, required_level)" +
+            cmd.CommandText = "INSERT INTO area (name, required_lvl)" +
                               "VALUES (@name, @requiredLevel)";
             cmd.Parameters.AddWithValue("@name", areaName);
             cmd.Parameters.AddWithValue("@requiredLevel", requiredLevel);
@@ -41,7 +41,7 @@ public class AreaDAO
         {
             connection.Open();
             MySqlCommand cmd = connection.CreateCommand();
-            cmd.CommandText = "UPDATE area SET required_level = @requiredLevel WHERE name = @name";
+            cmd.CommandText = "UPDATE area SET required_lvl = @requiredLevel WHERE name = @name";
             cmd.Parameters.AddWithValue("@requiredLevel", requiredLevel);
             cmd.Parameters.AddWithValue("@name", areaName);
             int rowsAffected = cmd.ExecuteNonQuery();
@@ -81,7 +81,7 @@ public class AreaDAO
         {
             connection.Open();
             MySqlCommand cmd = connection.CreateCommand();
-            cmd.CommandText = "SELECT id, name, required_level FROM area WHERE id = @id";
+            cmd.CommandText = "SELECT id, name, required_lvl FROM area WHERE id = @id";
             cmd.Parameters.AddWithValue("@id", areaId);
             MySqlDataReader reader = cmd.ExecuteReader();
             Area? area = null;
@@ -91,7 +91,7 @@ public class AreaDAO
                 {
                     Id = reader.GetInt32("id"),
                     Name = reader.GetString("name"),
-                    RequiredLVL = reader.GetInt32("required_level")
+                    RequiredLVL = reader.GetInt32("required_lvl")
                 };
             }
             connection.Close();
@@ -110,7 +110,7 @@ public class AreaDAO
         {
             connection.Open();
             MySqlCommand cmd = connection.CreateCommand();
-            cmd.CommandText = "SELECT id, name, required_level FROM area WHERE name = @name";
+            cmd.CommandText = "SELECT id, name, required_lvl FROM area WHERE name = @name";
             cmd.Parameters.AddWithValue("@name", areaName);
             MySqlDataReader reader = cmd.ExecuteReader();
             Area? area = null;
@@ -120,7 +120,7 @@ public class AreaDAO
                 {
                     Id = reader.GetInt32("id"),
                     Name = reader.GetString("name"),
-                    RequiredLVL = reader.GetInt32("required_level")
+                    RequiredLVL = reader.GetInt32("required_lvl")
                 };
             }
             connection.Close();

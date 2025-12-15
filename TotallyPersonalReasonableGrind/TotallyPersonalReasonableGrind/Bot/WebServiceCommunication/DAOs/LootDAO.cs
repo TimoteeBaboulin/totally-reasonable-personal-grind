@@ -22,7 +22,7 @@ public class LootDAO
         {
             connection.Open();
             MySqlCommand cmd = connection.CreateCommand();
-            cmd.CommandText = "INSERT INTO loot (item_id, area_id, quantity, type, rarity, required_level) " +
+            cmd.CommandText = "INSERT INTO loot (item_id, area_id, quantity, type, rarity, required_lvl) " +
                               "VALUES ((SELECT id FROM item WHERE name = @itemName), " +
                               "(SELECT id FROM area WHERE name = @areaName), @quantity, @type, @rarity, @requiredLevel)";
             cmd.Parameters.AddWithValue("@itemName", itemName);
@@ -117,7 +117,7 @@ public class LootDAO
         {
             connection.Open();
             MySqlCommand cmd = connection.CreateCommand();
-            cmd.CommandText = "UPDATE loot SET required_level = @requiredLevel " +
+            cmd.CommandText = "UPDATE loot SET required_lvl = @requiredLevel " +
                               "WHERE item_id = (SELECT id FROM item WHERE name = @itemName) " +
                               "AND area_id = (SELECT id FROM area WHERE name = @areaName)";
             cmd.Parameters.AddWithValue("@requiredLevel", requiredLevel);
@@ -140,7 +140,7 @@ public class LootDAO
         {
             connection.Open();
             MySqlCommand cmd = connection.CreateCommand();
-            cmd.CommandText = "SELECT quantity, rarity, required_level FROM loot " +
+            cmd.CommandText = "SELECT quantity, rarity, required_lvl FROM loot " +
                               "INNER JOIN item ON loot.item_id = item.id " +
                               "INNER JOIN area ON loot.area_id = area.id " +
                               "WHERE item.name = @itemName AND area.name = @areaName";
@@ -153,7 +153,7 @@ public class LootDAO
                 int quantity = reader.GetInt32("quantity");
                 string lootTypeStr = reader.GetString("type");
                 string rarityStr = reader.GetString("rarity");
-                int requiredLevel = reader.GetInt32("required_level");
+                int requiredLevel = reader.GetInt32("required_lvl");
                 LootType type = Enum.Parse<LootType>(lootTypeStr);
                 LootRarity rarity = Enum.Parse<LootRarity>(rarityStr);
                 loot = new Loot
@@ -184,7 +184,7 @@ public class LootDAO
         {
             connection.Open();
             MySqlCommand cmd = connection.CreateCommand();
-            cmd.CommandText = "SELECT loot.id, loot.item_id, loot.area_id, loot.quantity, loot.rarity, loot.required_level " +
+            cmd.CommandText = "SELECT loot.id, loot.item_id, loot.area_id, loot.quantity, loot.rarity, loot.required_lvl " +
                               "FROM loot INNER JOIN area ON loot.area_id = area.id " +
                               "WHERE area.name = @areaName";
             cmd.Parameters.AddWithValue("@areaName", areaName);
@@ -198,7 +198,7 @@ public class LootDAO
                     AreaId = reader.GetInt32("area_id"),
                     Quantity = reader.GetInt32("quantity"),
                     Rarity = Enum.Parse<LootRarity>(reader.GetString("rarity")),
-                    RequiredLevel = reader.GetInt32("required_level")
+                    RequiredLevel = reader.GetInt32("required_lvl")
                 };
                 loots.Add(loot);
             }
