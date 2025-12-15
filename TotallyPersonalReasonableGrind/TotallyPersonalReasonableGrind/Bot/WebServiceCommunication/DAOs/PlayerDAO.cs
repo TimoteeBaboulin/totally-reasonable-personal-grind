@@ -21,7 +21,7 @@ public class PlayerDAO
             connection.Open();
             MySqlCommand cmd = connection.CreateCommand();
             cmd.CommandText = "INSERT INTO player (name, combat_exp, combat_lvl, exploration_exp, exploration_lvl, area_id)" +
-                              "VALUES (@name, 0, 0, 0, 0, 0)";
+                              "VALUES (@name, 0, 0, 0, 0, 1)";
             cmd.Parameters.AddWithValue("@name", playerName);
             int rowsAffected = cmd.ExecuteNonQuery();
             connection.Close();
