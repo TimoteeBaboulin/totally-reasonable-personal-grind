@@ -28,8 +28,13 @@ public class InventoryCommand : ICommand
         EmbedBuilder embed = new();
         embed.WithTitle("Inventory");
         embed.WithAuthor(command.User.GlobalName);
-        embed.AddField(new EmbedFieldBuilder().WithName("Items").WithValue("test"));
-        embed.AddField(new EmbedFieldBuilder().WithName("Materials").WithValue("test"));
+        for (int i = 0; i < 1; i++)
+        {
+            embed.AddField(new EmbedFieldBuilder().WithValue("ItemName").WithIsInline(true));
+            embed.AddField(new EmbedFieldBuilder().WithValue("ItemGold").WithIsInline(true));
+            embed.AddField(new EmbedFieldBuilder().WithValue("ItemNumber").WithIsInline(true));
+            embed.AddField(new EmbedFieldBuilder());
+        }
         command.RespondAsync(embed: embed.Build());
         
         return Task.FromResult(false);
