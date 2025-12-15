@@ -137,6 +137,51 @@ public class RestClient
         }
     }
 
+    public async Task<string> SendRequestAsync(string parameters = "")
+    {
+        HttpWebRequest request = (HttpWebRequest)WebRequest.Create(this.EndPoint + parameters);
+        request.Method = Method.ToString();
+        request.ContentLength = 0;
+        request.ContentType = CurrentContentType;
+
+        if (!string.IsNullOrEmpty(Content) && Method != HttpVerb.GET)
+        {
+            request.AllowWriteStreamBuffering = false;
+            request.ContentLength = Content.Length;
+
+            Stream stream = await request.GetRequestStreamAsync();
+            StreamWriter writer = new StreamWriter(stream);
+            await writer.WriteAsync(Content);
+            await writer.FlushAsync();
+            writer.Close();
+            stream.Close();
+        }
+
+        using (HttpWebResponse response = (HttpWebResponse)await request.GetResponseAsync())
+        {
+            string responseValue = string.Empty;
+
+            if (response.StatusCode != HttpStatusCode.OK)
+            {
+                string message = string.Format("Request failed. Received http {0}", response.StatusCode);
+                throw new ApplicationException(message);
+            }
+
+            using (Stream stream = response.GetResponseStream())
+            {
+                if (stream != null)
+                {
+                    using (StreamReader reader = new StreamReader(stream))
+                    {
+                        responseValue = await reader.ReadToEndAsync();
+                    }
+                }
+            }
+
+            return responseValue;
+        }
+    }
+
     public string SendToWebService(string serviceName, HttpVerb method, Object? jsonSerializableObject,
         string parameters = "")
     {
@@ -148,5 +193,18 @@ public class RestClient
         }
 
         return SendRequest(parameters);
+    }
+    
+    public async Task<string> SendToWebServiceAsync(string serviceName, HttpVerb method, Object? jsonSerializableObject,
+        string parameters = "")
+    {
+        SetbaseClient(serviceName, parameters);
+        this.Method = method;
+        if (jsonSerializableObject != null)
+        {
+            this.Content = Newtonsoft.Json.JsonConvert.SerializeObject(jsonSerializableObject);
+        }
+
+        return await SendRequestAsync(parameters);
     }
 }

@@ -1,6 +1,7 @@
 using System.Net.Sockets;
 using Discord;
 using Discord.WebSocket;
+using HttpClient = TotallyPersonalReasonableGrind.Bot.WebServiceCommunication.Access.HttpClient;
 
 namespace TotallyPersonalReasonableGrind.Bot;
 
@@ -22,6 +23,8 @@ public class BotProgram
     
     public async void Main()
     {
+        HttpClient.Start();
+        
         m_client.Ready += OnClientReady;
         m_client.SlashCommandExecuted += m_commandDispatcher.OnSlashCommandExecuted;
         m_client.ButtonExecuted += m_commandDispatcher.OnComponentExecuted;

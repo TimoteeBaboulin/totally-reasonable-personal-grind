@@ -10,7 +10,7 @@ public class AreaDAO
     public AreaDAO()
     {
         const string connectionString =
-            "SERVER=127.0.0.1; DATABASE=totallypersonalreasonablegrind; UID=root; PASSWORD=root;";
+            "SERVER=10.0.7.74; DATABASE=totallyreasonablepersonalgrind; UID=root; PASSWORD=root;";
         connection = new MySqlConnection(connectionString);
     }
 
@@ -112,7 +112,7 @@ public class AreaDAO
             MySqlCommand cmd = connection.CreateCommand();
             cmd.CommandText = "SELECT COUNT(*) FROM area WHERE name = @name";
             cmd.Parameters.AddWithValue("@name", areaName);
-            long count = (long)cmd.ExecuteScalar()!;
+            int count = Convert.ToInt32(cmd.ExecuteScalar());
             connection.Close();
             return count > 0;
         }

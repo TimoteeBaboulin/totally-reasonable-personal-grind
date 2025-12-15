@@ -26,7 +26,9 @@ public class PlayerInfo : ICommand
     
     public Task<bool> OnSlashCommand(SocketSlashCommand command) {
         //Get Player Info
-        Player p = PlayerAccess.GetOrCreatePlayer(command.User.GlobalName);
+        Task<Player> player = PlayerAccess.GetOrCreatePlayer(command.User.GlobalName);
+        player.Wait();
+        Player p = player.Result;
         
         // Display Player Info
         EmbedBuilder embed = new();
