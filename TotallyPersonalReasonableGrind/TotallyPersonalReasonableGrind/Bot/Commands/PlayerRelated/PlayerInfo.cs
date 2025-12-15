@@ -34,10 +34,11 @@ public class PlayerInfo : ICommand
         // Display Player Info
         EmbedBuilder embed = new();
         embed.WithTitle("Player Info");
-        embed.WithAuthor(command.User.GlobalName);
-        embed.Fields.Add(new EmbedFieldBuilder().WithName("Combat Xp").WithValue(p.CombatEXP));
+        embed.WithAuthor(command.User.GlobalName, command.User.GetAvatarUrl());
+        embed.Fields.Add(new EmbedFieldBuilder().WithName("Combat Xp").WithValue(p.CombatEXP).WithIsInline(true));
         embed.Fields.Add(new EmbedFieldBuilder().WithName("Combat LvL").WithValue(p.CombatLVL).WithIsInline(true));
-        embed.Fields.Add(new EmbedFieldBuilder().WithName("Exploration Xp").WithValue(p.ExplorationEXP));
+        embed.Fields.Add(new EmbedFieldBuilder().WithName("ㅤ").WithValue("ㅤ").WithIsInline(true));
+        embed.Fields.Add(new EmbedFieldBuilder().WithName("Exploration Xp").WithValue(p.ExplorationEXP).WithIsInline(true));
         embed.Fields.Add(new EmbedFieldBuilder().WithName("Exploration LvL").WithValue(p.ExplorationLVL).WithIsInline(true));
         command.RespondAsync(embed: embed.Build());
         

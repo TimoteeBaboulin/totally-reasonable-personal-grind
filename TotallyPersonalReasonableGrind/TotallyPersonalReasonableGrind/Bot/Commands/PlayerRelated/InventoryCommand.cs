@@ -35,7 +35,6 @@ public class InventoryCommand : ICommand
             embed.AddField(new EmbedFieldBuilder().WithValue("ItemName").WithIsInline(true));
             embed.AddField(new EmbedFieldBuilder().WithValue("ItemGold").WithIsInline(true));
             embed.AddField(new EmbedFieldBuilder().WithValue("ItemNumber").WithIsInline(true));
-            embed.AddField(new EmbedFieldBuilder());
         }
         command.RespondAsync(embed: embed.Build());
         
