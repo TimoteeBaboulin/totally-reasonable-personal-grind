@@ -112,7 +112,8 @@ public class ItemDAO
                 {
                     Id = reader.GetInt32("id"),
                     Name = reader.GetString("name"),
-                    SellValue = reader.GetInt32("sell_value")
+                    SellValue = reader.GetInt32("sell_value"),
+                    EmojiName = reader.GetString("emoji_name")
                 };
                 connection.Close();
                 return item;
@@ -142,7 +143,8 @@ public class ItemDAO
                 {
                     Id = reader.GetInt32("id"),
                     Name = reader.GetString("name"),
-                    SellValue = reader.GetInt32("sell_value")
+                    SellValue = reader.GetInt32("sell_value"),
+                    EmojiName = reader.GetString("emoji_name")
                 };
                 connection.Close();
                 return item;
