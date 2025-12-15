@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("TotallyPersonalReasonableGrind")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4171c629def10565f41adf337b51042a04491251")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5c28a59ddcd973c7742ec1b436f2131792be7228")]
 [assembly: System.Reflection.AssemblyProductAttribute("TotallyPersonalReasonableGrind")]
 [assembly: System.Reflection.AssemblyTitleAttribute("TotallyPersonalReasonableGrind")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
