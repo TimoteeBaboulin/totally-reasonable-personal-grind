@@ -6,6 +6,8 @@ namespace TotallyPersonalReasonableGrind.Bot.Commands.PlayerRelated;
 
 public class PlayerInfo : ICommand
 {
+    public ulong Id { get; }
+
     public static SocketApplicationCommand BuildProperties()
     {
         SlashCommandBuilder builder = new();
@@ -20,13 +22,20 @@ public class PlayerInfo : ICommand
         return result;
     }
 
-    public ulong Id { get; }
     
 
     
     public Task<bool> OnSlashCommand(SocketSlashCommand command) {
         // Display Player Info
-        command.RespondAsync("Player Info");
+        EmbedBuilder embed = new();
+        embed.WithTitle("Player Info");
+        embed.WithAuthor(command.User.GlobalName);
+        embed.Fields.Add(new EmbedFieldBuilder().WithName("Combat Xp").WithValue("test"));
+        embed.Fields.Add(new EmbedFieldBuilder().WithName("Combat LvL").WithValue("test"));
+        embed.Fields.Add(new EmbedFieldBuilder().WithName("Exploration Xp").WithValue("test"));
+        embed.Fields.Add(new EmbedFieldBuilder().WithName("Exploration LvL").WithValue("test"));
+        embed.Fields.Add(new EmbedFieldBuilder().WithName("Current Position").WithValue("test"));
+        command.RespondAsync(embed: embed.Build());
         
         return Task.FromResult(false);
     }
