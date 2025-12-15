@@ -72,6 +72,8 @@ public class CommandDispatcher
     public async Task OnComponentExecuted(SocketMessageComponent component)
     {
         string customId = component.Data.CustomId;
+        await component.DeferAsync();
+        
         string[] tokens = customId.Split('|');
         if (tokens.Length == 0)
         {
