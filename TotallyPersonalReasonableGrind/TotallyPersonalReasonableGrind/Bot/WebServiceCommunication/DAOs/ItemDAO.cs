@@ -97,6 +97,36 @@ public class ItemDAO
         }
     }
     
+    public Item? GetItemById(int itemId)
+    {
+        try
+        {
+            connection.Open();
+            MySqlCommand cmd = connection.CreateCommand();
+            cmd.CommandText = "SELECT * FROM item WHERE id = @id";
+            cmd.Parameters.AddWithValue("@id", itemId);
+            MySqlDataReader reader = cmd.ExecuteReader();
+            if (reader.Read())
+            {
+                Item item = new Item
+                {
+                    Id = reader.GetInt32("id"),
+                    Name = reader.GetString("name"),
+                    SellValue = reader.GetInt32("sell_value")
+                };
+                connection.Close();
+                return item;
+            }
+            connection.Close();
+            return null;
+        }
+        catch
+        {
+            connection.Close();
+            return null;
+        }
+    }
+    
     public Item? GetItem(string itemName)
     {
         try

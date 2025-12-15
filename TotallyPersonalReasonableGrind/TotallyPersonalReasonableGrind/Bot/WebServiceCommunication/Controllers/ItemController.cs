@@ -54,6 +54,15 @@ public class ItemController : Controller
             ? new HttpResponseMessage(HttpStatusCode.OK)
             : new HttpResponseMessage(HttpStatusCode.InternalServerError);
     }
+
+    [HttpGet]
+    [Route("Item/GetById/{itemId}")]
+    public Item? GetItemById(int itemId)
+    {
+        itemDAO = new ItemDAO();
+        
+        return itemDAO.GetItemById(itemId);
+    }
     
     [HttpGet]
     [Route("Item/Get/{itemName}")]
