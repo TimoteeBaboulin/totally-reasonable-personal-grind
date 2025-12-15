@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using MySql.Data.MySqlClient;
 using TotallyPersonalReasonableGrind.Bot.WebServiceCommunication.Models;
 

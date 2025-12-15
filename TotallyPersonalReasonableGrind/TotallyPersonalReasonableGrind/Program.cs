@@ -1,5 +1,8 @@
 using Discord;
 using Discord.WebSocket;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using TotallyPersonalReasonableGrind.Bot;
 
 var builder = WebApplication.CreateBuilder(args);
