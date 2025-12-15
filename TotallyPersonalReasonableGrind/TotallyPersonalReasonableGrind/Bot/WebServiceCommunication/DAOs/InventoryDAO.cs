@@ -10,7 +10,7 @@ public class InventoryDAO
     public InventoryDAO()
     {
         const string connectionString =
-            "SERVER=127.0.0.1; DATABASE=totallypersonalreasonablegrind; UID=root; PASSWORD=root;";
+            "SERVER=10.0.7.74; DATABASE=totallypersonalreasonablegrind; UID=root; PASSWORD=root;";
         connection = new MySqlConnection(connectionString);
     }
 
