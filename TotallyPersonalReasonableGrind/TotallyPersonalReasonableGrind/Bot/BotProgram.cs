@@ -6,7 +6,7 @@ namespace TotallyPersonalReasonableGrind.Bot;
 
 public class BotProgram
 {
-    private static DiscordSocketClient m_client = new();
+    public static DiscordSocketClient m_client = new();
     private CommandDispatcher.CommandDispatcher m_commandDispatcher = new();
 
     public static async Task<SocketApplicationCommand> CreateSlashCommand(SlashCommandProperties properties)
