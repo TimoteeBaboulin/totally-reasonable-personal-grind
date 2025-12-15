@@ -29,7 +29,7 @@ CREATE TABLE `area` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `id_UNIQUE` (`id`),
   UNIQUE KEY `name_UNIQUE` (`name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -38,6 +38,7 @@ CREATE TABLE `area` (
 
 LOCK TABLES `area` WRITE;
 /*!40000 ALTER TABLE `area` DISABLE KEYS */;
+INSERT INTO `area` VALUES (1,'Plain',0);
 /*!40000 ALTER TABLE `area` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -59,7 +60,7 @@ CREATE TABLE `inventory` (
   KEY `FK_INVENTORY_ITEM_ID_idx` (`item_id`),
   CONSTRAINT `FK_INVENTORY_ITEM_ID` FOREIGN KEY (`item_id`) REFERENCES `item` (`id`) ON DELETE CASCADE,
   CONSTRAINT `FK_INVENTORY_PLAYER_ID` FOREIGN KEY (`player_id`) REFERENCES `player` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -68,6 +69,7 @@ CREATE TABLE `inventory` (
 
 LOCK TABLES `inventory` WRITE;
 /*!40000 ALTER TABLE `inventory` DISABLE KEYS */;
+INSERT INTO `inventory` VALUES (1,3,1,4),(2,3,2,4);
 /*!40000 ALTER TABLE `inventory` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -81,12 +83,12 @@ DROP TABLE IF EXISTS `item`;
 CREATE TABLE `item` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(45) NOT NULL,
-  `type` varchar(45) NOT NULL,
   `sell_value` int unsigned NOT NULL,
+  `emoji_name` varchar(100) DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `id_UNIQUE` (`id`),
   UNIQUE KEY `name_UNIQUE` (`name`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -95,6 +97,7 @@ CREATE TABLE `item` (
 
 LOCK TABLES `item` WRITE;
 /*!40000 ALTER TABLE `item` DISABLE KEYS */;
+INSERT INTO `item` VALUES (1,'Mushroom',2,'mushroom'),(2,'Rock',1,'rock'),(3,'Bone',2,'bone');
 /*!40000 ALTER TABLE `item` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -110,6 +113,7 @@ CREATE TABLE `loot` (
   `item_id` int unsigned NOT NULL,
   `area_id` int unsigned NOT NULL,
   `quantity` int unsigned NOT NULL,
+  `type` varchar(45) NOT NULL,
   `rarity` varchar(45) NOT NULL,
   `required_lvl` int unsigned NOT NULL,
   PRIMARY KEY (`id`),
@@ -118,7 +122,7 @@ CREATE TABLE `loot` (
   KEY `FK_LOOT_AREA_ID_idx` (`area_id`),
   CONSTRAINT `FK_LOOT_AREA_ID` FOREIGN KEY (`area_id`) REFERENCES `area` (`id`) ON DELETE CASCADE,
   CONSTRAINT `FK_LOOT_ITEM_ID` FOREIGN KEY (`item_id`) REFERENCES `item` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -127,6 +131,7 @@ CREATE TABLE `loot` (
 
 LOCK TABLES `loot` WRITE;
 /*!40000 ALTER TABLE `loot` DISABLE KEYS */;
+INSERT INTO `loot` VALUES (1,1,1,2,'Walk','Common',0),(2,2,1,4,'Walk','Common',0),(3,3,1,4,'Hit','Common',0);
 /*!40000 ALTER TABLE `loot` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -144,13 +149,13 @@ CREATE TABLE `player` (
   `combat_lvl` int DEFAULT NULL,
   `exploration_exp` int DEFAULT NULL,
   `exploration_lvl` int DEFAULT NULL,
-  `area_id` int unsigned NOT NULL,
+  `area_id` int unsigned DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `id_UNIQUE` (`id`),
   UNIQUE KEY `name_UNIQUE` (`name`),
   KEY `FK_PLAYER_AREA_ID_idx` (`area_id`),
-  CONSTRAINT `FK_PLAYER_AREA_ID` FOREIGN KEY (`area_id`) REFERENCES `area` (`id`) ON DELETE RESTRICT
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  CONSTRAINT `FK_PLAYER_AREA_ID` FOREIGN KEY (`area_id`) REFERENCES `area` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -159,6 +164,7 @@ CREATE TABLE `player` (
 
 LOCK TABLES `player` WRITE;
 /*!40000 ALTER TABLE `player` DISABLE KEYS */;
+INSERT INTO `player` VALUES (1,'theodu30_',0,0,0,0,1),(3,'PiwoZz',0,0,0,0,1),(4,'TheMoonBeard',0,0,0,0,1);
 /*!40000 ALTER TABLE `player` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -171,4 +177,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-12-15 10:53:03
+-- Dump completed on 2025-12-15 17:41:37
