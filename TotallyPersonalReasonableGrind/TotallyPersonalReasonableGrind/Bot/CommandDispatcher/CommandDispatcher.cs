@@ -1,3 +1,7 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using Discord.WebSocket;
 using TotallyPersonalReasonableGrind.Bot.Interfaces;
 
@@ -68,6 +72,8 @@ public class CommandDispatcher
     public async Task OnComponentExecuted(SocketMessageComponent component)
     {
         string customId = component.Data.CustomId;
+        await component.DeferAsync();
+        
         string[] tokens = customId.Split('|');
         if (tokens.Length == 0)
         {
