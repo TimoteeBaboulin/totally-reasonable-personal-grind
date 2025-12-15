@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
 using TotallyPersonalReasonableGrind.Bot.Interfaces;
+using TotallyPersonalReasonableGrind.Bot.WebServiceCommunication.Access;
 
 namespace TotallyPersonalReasonableGrind.Bot.Commands.PlayerRelated;
 
@@ -26,6 +27,9 @@ public class InventoryCommand : ICommand
 
     public Task<bool> OnSlashCommand(SocketSlashCommand command)
     {
+        //Get Player Inventory
+        var inv = InventoryAccess.GetInventoryData(command.User.GlobalName).Result;
+        
         // Display Inventory
         EmbedBuilder embed = new();
         embed.WithTitle("Inventory");
