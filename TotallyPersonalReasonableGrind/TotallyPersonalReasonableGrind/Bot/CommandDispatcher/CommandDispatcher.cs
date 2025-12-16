@@ -48,6 +48,8 @@ public class CommandDispatcher
     
     public async Task OnSlashCommandExecuted(SocketSlashCommand command)
     {
+        command.DeferAsync();
+        
         Type? commandType;
         if (!TryGetCommandType(command.Data.Id, out commandType))
         {
