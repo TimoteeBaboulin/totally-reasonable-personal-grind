@@ -20,4 +20,9 @@ public class Item
         };
         return Newtonsoft.Json.JsonConvert.DeserializeObject<Item>(createResponse, settings);
     }
+
+    public static string EmojiFromName(Item item)
+    {
+        return ":" + item.EmojiName + ":";
+    }
 }
