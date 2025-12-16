@@ -140,7 +140,7 @@ public class LootDAO
         {
             connection.Open();
             MySqlCommand cmd = connection.CreateCommand();
-            cmd.CommandText = "SELECT * FROM loot " +
+            cmd.CommandText = "SELECT loot.* FROM loot " +
                               "INNER JOIN item ON loot.item_id = item.id " +
                               "INNER JOIN area ON loot.area_id = area.id " +
                               "WHERE item.name = @itemName AND area.name = @areaName";
@@ -150,7 +150,7 @@ public class LootDAO
             Loot? loot = null;
             if (reader.Read())
             {
-                loot = Loot.FromSQLReader(reader);
+                loot = Loot.FromSQLReader(ref reader);
             }
             connection.Close();
             return loot;
@@ -169,14 +169,14 @@ public class LootDAO
         {
             connection.Open();
             MySqlCommand cmd = connection.CreateCommand();
-            cmd.CommandText = "SELECT * " +
+            cmd.CommandText = "SELECT loot.* " +
                               "FROM loot INNER JOIN area ON loot.area_id = area.id " +
                               "WHERE area.name = @areaName";
             cmd.Parameters.AddWithValue("@areaName", areaName);
             MySqlDataReader reader = cmd.ExecuteReader();
             while (reader.Read())
             {
-                loots.Add(Loot.FromSQLReader(reader));
+                loots.Add(Loot.FromSQLReader(ref reader));
             }
             connection.Close();
         }
@@ -194,13 +194,13 @@ public class LootDAO
         {
             connection.Open();
             MySqlCommand cmd = connection.CreateCommand();
-            cmd.CommandText = "SELECT * " +
+            cmd.CommandText = "SELECT loot.* " +
                               "FROM loot WHERE item_id = @itemId";
             cmd.Parameters.AddWithValue("@itemId", itemId);
             MySqlDataReader reader = cmd.ExecuteReader();
             while (reader.Read())
             {
-                loots.Add(Loot.FromSQLReader(reader));
+                loots.Add(Loot.FromSQLReader(ref reader));
             }
             connection.Close();
         }
@@ -218,14 +218,14 @@ public class LootDAO
         {
             connection.Open();
             MySqlCommand cmd = connection.CreateCommand();
-            cmd.CommandText = "SELECT * " +
+            cmd.CommandText = "SELECT loot.* " +
                               "FROM loot INNER JOIN item ON loot.item_id = item.id " +
                               "WHERE item.name = @itemName";
             cmd.Parameters.AddWithValue("@itemName", itemName);
             MySqlDataReader reader = cmd.ExecuteReader();
             while (reader.Read())
             {
-                loots.Add(Loot.FromSQLReader(reader));
+                loots.Add(Loot.FromSQLReader(ref reader));
             }
             connection.Close();
         }

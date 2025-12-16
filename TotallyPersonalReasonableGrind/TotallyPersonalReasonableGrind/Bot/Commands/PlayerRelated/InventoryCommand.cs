@@ -10,16 +10,13 @@ namespace TotallyPersonalReasonableGrind.Bot.Commands.PlayerRelated;
 
 public class InventoryCommand : ICommand
 {
-    public class InventoryMessageBuilder
+    private class InventoryMessageBuilder(List<Inventory> inventories)
     {
-        public List<Inventory> Inventories = new();
-        public InventoryMessageBuilder(List<Inventory> inventories) => Inventories = inventories;
-
         public void WriteInventoryMessage(MessageProperties properties)
         {
             EmbedBuilder embed = new();
             embed.WithTitle("Inventory");
-            foreach (var current in Inventories)
+            foreach (var current in inventories)
             {
                 if (current.Quantity == 0) continue;
                 Item item = ItemAccess.GetItemById(current.ItemId).Result;
@@ -41,11 +38,9 @@ public class InventoryCommand : ICommand
 
         SlashCommandProperties properties = builder.Build();
 
-        var task = BotProgram.CreateSlashCommand(properties);
-        task.Wait();
-        var result = task.Result;
+        var task = BotProgram.CreateSlashCommand(properties).Result;
 
-        return result;
+        return task;
     }
 
 
@@ -56,7 +51,6 @@ public class InventoryCommand : ICommand
         InventoryMessageBuilder builder = new(inv);
 
         // Display Inventory
-
         command.ModifyOriginalResponseAsync(builder.WriteInventoryMessage);
 
         return Task.FromResult(false);

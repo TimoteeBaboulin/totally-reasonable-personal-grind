@@ -1,25 +1,38 @@
-using System;
-using System.Linq;
-using System.Threading.Tasks;
 using Discord;
 using Discord.WebSocket;
 using TotallyPersonalReasonableGrind.Bot.Interfaces;
+using TotallyPersonalReasonableGrind.Bot.WebServiceCommunication.Access;
+using TotallyPersonalReasonableGrind.Bot.WebServiceCommunication.Models;
 
 namespace TotallyPersonalReasonableGrind.Bot.Commands.PlayerRelated;
 
 public class LootInfoCommand : ICommand
 {
+    private class LootInfoMessageBuilder(Loot loot)
+    {
+        public void WriteLootMessage(MessageProperties properties)
+        {
+            Item item = ItemAccess.GetItemById(loot.ItemId).Result;
+            EmbedBuilder embed = new();
+            embed.WithTitle(item.Name + " " + Item.EmojiFromName(item));
+            embed.Fields.Add(new EmbedFieldBuilder().WithName("Area").WithValue(AreaAccess.GetAreaById(loot.AreaId).Result.Name).WithIsInline(true));
+            embed.Fields.Add(new EmbedFieldBuilder().WithName("Rarity").WithValue(loot.Rarity.ToString()).WithIsInline(true));
+            embed.Fields.Add(new EmbedFieldBuilder().WithName("Required Level").WithValue(loot.RequiredLevel).WithIsInline(true));
+
+            properties.Embed = embed.Build();
+        }
+    }
     public ulong Id { get; }
     
     public static SocketApplicationCommand BuildProperties()
     {
         SlashCommandOptionBuilder list = new();
         list.WithName("item").WithDescription("Item to get info about").WithType(ApplicationCommandOptionType.String).WithRequired(true);
-        string[] oui = ["test", "try" , "worth"];
-        for (var index = 0; index < oui.Length; index++)
+        var itemList = ItemAccess.GetAllItems().Result;
+        for (var index = 0; index < itemList.Count; index++)
         {
-            var lootName = oui[index];
-            list.AddChoice(lootName, lootName);
+            var lootName = itemList[index];
+            list.AddChoice(lootName.Name, lootName.Name);
         }
 
         SlashCommandBuilder builder = new();
@@ -37,17 +50,11 @@ public class LootInfoCommand : ICommand
     {
         //Get Item Info
         var itemName = command.Data.Options.First().Value;
-        
+        Loot rightLoot = LootAccess.GetLootEntriesByItemName((string)itemName).Result.First();
+        LootInfoMessageBuilder builder = new(rightLoot);
         
         //Display loot Info
-        EmbedBuilder embed = new();
-        embed.WithTitle((string)itemName);
-        embed.WithAuthor(command.User.GlobalName);
-        embed.ImageUrl = "https://i.imgur.com/2521111.png";
-        embed.Fields.Add(new EmbedFieldBuilder().WithName("Area").WithValue("Home").WithIsInline(true));
-        embed.Fields.Add(new EmbedFieldBuilder().WithName("Rarity").WithValue("Golden").WithIsInline(true));
-        embed.Fields.Add(new EmbedFieldBuilder().WithName("Required Level").WithValue("Too much").WithIsInline(true));
-        command.RespondAsync(embed: embed.Build());
+        command.ModifyOriginalResponseAsync(builder.WriteLootMessage);
         
         return Task.FromResult(false);
     }

@@ -52,7 +52,7 @@ public class Loot
         return Newtonsoft.Json.JsonConvert.DeserializeObject<List<Loot>>(createResponse, settings);
     }
 
-    public static Loot FromSQLReader(MySqlDataReader reader)
+    public static Loot FromSQLReader(ref MySqlDataReader reader)
     {
         Loot loot = new Loot
         {
