@@ -60,6 +60,13 @@ public class PlayerAccess
         return leveledUp;
     }
     
+    public static async Task UpdatePlayerMoney(string playerName, int amount)
+    {
+        Player player = await GetOrCreatePlayer(playerName);
+        player.Money += amount;
+        await HttpClient.Client.SendToWebServiceAsync($"Player/Update/Money/{playerName}/{player.Money}", HttpVerb.PUT, null);
+    }
+    
     public static async Task<int> GetPlayerMeanLevel(string playerName)
     {
         Player player = await GetOrCreatePlayer(playerName);
