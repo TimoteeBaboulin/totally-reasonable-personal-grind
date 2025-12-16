@@ -22,6 +22,8 @@ public class PlayerInfo : ICommand
             embed.Fields.Add(new EmbedFieldBuilder().WithName("Exploration LvL").WithValue(player.ExplorationLVL).WithIsInline(true));
             embed.Fields.Add(new EmbedFieldBuilder().WithName("ㅤ").WithValue("ㅤ").WithIsInline(true));
             embed.Fields.Add(new EmbedFieldBuilder().WithName("Money").WithValue(player.Money).WithIsInline(true));
+            
+            properties.Embed = embed.Build();
         }
     }
     
