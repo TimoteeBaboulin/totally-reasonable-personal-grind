@@ -9,6 +9,22 @@ namespace TotallyPersonalReasonableGrind.Bot.Commands.PlayerRelated;
 
 public class PlayerInfo : ICommand
 {
+    private class PlayerInfoMessageBuilder(Player player)
+    {
+        public void WritePlayerInfoMessage(MessageProperties properties)
+        {
+            EmbedBuilder embed = new();
+            embed.WithTitle("Player Info");
+            embed.Fields.Add(new EmbedFieldBuilder().WithName("Combat Xp").WithValue(player.CombatEXP).WithIsInline(true));
+            embed.Fields.Add(new EmbedFieldBuilder().WithName("Combat LvL").WithValue(player.CombatLVL).WithIsInline(true));
+            embed.Fields.Add(new EmbedFieldBuilder().WithName("ㅤ").WithValue("ㅤ").WithIsInline(true));
+            embed.Fields.Add(new EmbedFieldBuilder().WithName("Exploration Xp").WithValue(player.ExplorationEXP).WithIsInline(true));
+            embed.Fields.Add(new EmbedFieldBuilder().WithName("Exploration LvL").WithValue(player.ExplorationLVL).WithIsInline(true));
+            embed.Fields.Add(new EmbedFieldBuilder().WithName("ㅤ").WithValue("ㅤ").WithIsInline(true));
+            embed.Fields.Add(new EmbedFieldBuilder().WithName("Money").WithValue(player.Money).WithIsInline(true));
+        }
+    }
+    
     public ulong Id { get; }
 
     public static SocketApplicationCommand BuildProperties()
@@ -32,15 +48,8 @@ public class PlayerInfo : ICommand
         Player p = player.Result;
         
         // Display Player Info
-        EmbedBuilder embed = new();
-        embed.WithTitle("Player Info");
-        embed.WithAuthor(command.User.GlobalName, command.User.GetAvatarUrl());
-        embed.Fields.Add(new EmbedFieldBuilder().WithName("Combat Xp").WithValue(p.CombatEXP).WithIsInline(true));
-        embed.Fields.Add(new EmbedFieldBuilder().WithName("Combat LvL").WithValue(p.CombatLVL).WithIsInline(true));
-        embed.Fields.Add(new EmbedFieldBuilder().WithName("ㅤ").WithValue("ㅤ").WithIsInline(true));
-        embed.Fields.Add(new EmbedFieldBuilder().WithName("Exploration Xp").WithValue(p.ExplorationEXP).WithIsInline(true));
-        embed.Fields.Add(new EmbedFieldBuilder().WithName("Exploration LvL").WithValue(p.ExplorationLVL).WithIsInline(true));
-        command.RespondAsync(embed: embed.Build());
+        PlayerInfoMessageBuilder builder = new(p);
+        command.ModifyOriginalResponseAsync(builder.WritePlayerInfoMessage);
         
         return Task.FromResult(false);
     }
