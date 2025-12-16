@@ -140,7 +140,7 @@ public class LootDAO
         {
             connection.Open();
             MySqlCommand cmd = connection.CreateCommand();
-            cmd.CommandText = "SELECT quantity, rarity, required_lvl FROM loot " +
+            cmd.CommandText = "SELECT * FROM loot " +
                               "INNER JOIN item ON loot.item_id = item.id " +
                               "INNER JOIN area ON loot.area_id = area.id " +
                               "WHERE item.name = @itemName AND area.name = @areaName";
@@ -169,7 +169,7 @@ public class LootDAO
         {
             connection.Open();
             MySqlCommand cmd = connection.CreateCommand();
-            cmd.CommandText = "SELECT loot.id, loot.item_id, loot.area_id, loot.quantity, loot.rarity, loot.required_lvl " +
+            cmd.CommandText = "SELECT * " +
                               "FROM loot INNER JOIN area ON loot.area_id = area.id " +
                               "WHERE area.name = @areaName";
             cmd.Parameters.AddWithValue("@areaName", areaName);
@@ -194,7 +194,7 @@ public class LootDAO
         {
             connection.Open();
             MySqlCommand cmd = connection.CreateCommand();
-            cmd.CommandText = "SELECT id, item_id, area_id, quantity, rarity, required_lvl " +
+            cmd.CommandText = "SELECT * " +
                               "FROM loot WHERE item_id = @itemId";
             cmd.Parameters.AddWithValue("@itemId", itemId);
             MySqlDataReader reader = cmd.ExecuteReader();
@@ -218,7 +218,7 @@ public class LootDAO
         {
             connection.Open();
             MySqlCommand cmd = connection.CreateCommand();
-            cmd.CommandText = "SELECT loot.id, loot.item_id, loot.area_id, loot.quantity, loot.rarity, loot.required_lvl " +
+            cmd.CommandText = "SELECT * " +
                               "FROM loot INNER JOIN item ON loot.item_id = item.id " +
                               "WHERE item.name = @itemName";
             cmd.Parameters.AddWithValue("@itemName", itemName);
