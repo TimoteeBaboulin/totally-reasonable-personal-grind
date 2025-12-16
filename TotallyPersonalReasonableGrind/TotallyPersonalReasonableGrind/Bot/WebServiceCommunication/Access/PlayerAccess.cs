@@ -90,4 +90,15 @@ public class PlayerAccess
         Player player = await GetOrCreatePlayer(playerName);
         return player.ExplorationLVL;
     }
+    
+    public static async Task<int> GetNextEXPRequiredForNextLevel(string playerName, string statType)
+    {
+        Player player = await GetOrCreatePlayer(playerName);
+        return statType switch
+        {
+            "Combat" => (player.CombatLVL + 1) * 100,
+            "Exploration" => (player.ExplorationLVL + 1) * 100,
+            _ => throw new Exception("Invalid stat type.")
+        };
+    }
 }
