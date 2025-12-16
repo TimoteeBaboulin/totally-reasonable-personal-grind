@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using MySql.Data.MySqlClient;
 
 namespace TotallyPersonalReasonableGrind.Bot.WebServiceCommunication.Models;
 
@@ -49,5 +50,20 @@ public class Loot
             }
         };
         return Newtonsoft.Json.JsonConvert.DeserializeObject<List<Loot>>(createResponse, settings);
+    }
+
+    public static Loot FromSQLReader(MySqlDataReader reader)
+    {
+        Loot loot = new Loot
+        {
+            Id = reader.GetInt32("Id"),
+            ItemId = reader.GetInt32("ItemId"),
+            AreaId = reader.GetInt32("AreaId"),
+            Quantity = reader.GetInt32("Quantity"),
+            Type = Enum.Parse<LootType>(reader.GetString("Type")),
+            Rarity = Enum.Parse<LootRarity>(reader.GetString("Rarity")),
+            RequiredLevel = reader.GetInt32("RequiredLevel")
+        };
+        return loot;
     }
 }

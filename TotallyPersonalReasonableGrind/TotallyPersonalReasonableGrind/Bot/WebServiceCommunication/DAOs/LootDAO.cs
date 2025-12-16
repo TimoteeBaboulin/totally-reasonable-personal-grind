@@ -150,22 +150,7 @@ public class LootDAO
             Loot? loot = null;
             if (reader.Read())
             {
-                int quantity = reader.GetInt32("quantity");
-                string lootTypeStr = reader.GetString("type");
-                string rarityStr = reader.GetString("rarity");
-                int requiredLevel = reader.GetInt32("required_lvl");
-                LootType type = Enum.Parse<LootType>(lootTypeStr);
-                LootRarity rarity = Enum.Parse<LootRarity>(rarityStr);
-                loot = new Loot
-                {
-                    Id = reader.GetInt32("id"),
-                    ItemId =  reader.GetInt32("item_id"),
-                    AreaId =  reader.GetInt32("area_id"),
-                    Quantity = quantity,
-                    Type = type,
-                    Rarity = rarity,
-                    RequiredLevel = requiredLevel
-                };
+                loot = Loot.FromSQLReader(reader);
             }
             connection.Close();
             return loot;
@@ -191,16 +176,56 @@ public class LootDAO
             MySqlDataReader reader = cmd.ExecuteReader();
             while (reader.Read())
             {
-                Loot loot = new Loot
-                {
-                    Id = reader.GetInt32("id"),
-                    ItemId = reader.GetInt32("item_id"),
-                    AreaId = reader.GetInt32("area_id"),
-                    Quantity = reader.GetInt32("quantity"),
-                    Rarity = Enum.Parse<LootRarity>(reader.GetString("rarity")),
-                    RequiredLevel = reader.GetInt32("required_lvl")
-                };
-                loots.Add(loot);
+                loots.Add(Loot.FromSQLReader(reader));
+            }
+            connection.Close();
+        }
+        catch
+        {
+            connection.Close();
+        }
+        return loots;
+    }
+
+    public List<Loot> GetLootEntriesByItemId(int itemId)
+    {
+        List<Loot> loots = new List<Loot>();
+        try
+        {
+            connection.Open();
+            MySqlCommand cmd = connection.CreateCommand();
+            cmd.CommandText = "SELECT id, item_id, area_id, quantity, rarity, required_lvl " +
+                              "FROM loot WHERE item_id = @itemId";
+            cmd.Parameters.AddWithValue("@itemId", itemId);
+            MySqlDataReader reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                loots.Add(Loot.FromSQLReader(reader));
+            }
+            connection.Close();
+        }
+        catch
+        {
+            connection.Close();
+        }
+        return loots;
+    }
+    
+    public List<Loot> GetLootEntriesByItemName(string itemName)
+    {
+        List<Loot> loots = new List<Loot>();
+        try
+        {
+            connection.Open();
+            MySqlCommand cmd = connection.CreateCommand();
+            cmd.CommandText = "SELECT loot.id, loot.item_id, loot.area_id, loot.quantity, loot.rarity, loot.required_lvl " +
+                              "FROM loot INNER JOIN item ON loot.item_id = item.id " +
+                              "WHERE item.name = @itemName";
+            cmd.Parameters.AddWithValue("@itemName", itemName);
+            MySqlDataReader reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                loots.Add(Loot.FromSQLReader(reader));
             }
             connection.Close();
         }

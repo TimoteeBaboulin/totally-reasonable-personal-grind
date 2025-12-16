@@ -90,6 +90,24 @@ public class LootController : Controller
 
         return lootDAO.GetLootEntriesOfArea(areaName);
     }
+    
+    [HttpGet]
+    [Route("Loot/GetAllByItemId/{itemId}")]
+    public List<Loot> GetLootEntriesByItemId(int itemId)
+    {
+        lootDAO = new LootDAO();
+        
+        return lootDAO.GetLootEntriesByItemId(itemId);
+    }
+    
+    [HttpGet]
+    [Route("Loot/GetAllByItemName/{itemName}")]
+    public List<Loot> GetLootEntriesByItemName(string itemName)
+    {
+        lootDAO = new LootDAO();
+        
+        return lootDAO.GetLootEntriesByItemName(itemName);
+    }
 
     [HttpDelete]
     [Route("Loot/Delete/{itemName}/{areaName}")]
