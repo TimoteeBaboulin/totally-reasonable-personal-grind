@@ -66,4 +66,17 @@ public class Loot
         };
         return loot;
     }
+
+    public static int GainEXP(Loot loot)
+    {
+        return loot.Quantity * loot.Rarity switch 
+        {
+            LootRarity.Common => 1,
+            LootRarity.UnCommon => 3,
+            LootRarity.Rare => 7,
+            LootRarity.Epic => 15,
+            LootRarity.Legendary => 30,
+            _ => 0
+        };
+    }
 }
