@@ -108,13 +108,7 @@ public class ItemDAO
             MySqlDataReader reader = cmd.ExecuteReader();
             if (reader.Read())
             {
-                Item item = new Item
-                {
-                    Id = reader.GetInt32("id"),
-                    Name = reader.GetString("name"),
-                    SellValue = reader.GetInt32("sell_value"),
-                    EmojiName = reader.GetString("emoji_name")
-                };
+                Item item = Item.FromSQLReader(reader);
                 connection.Close();
                 return item;
             }
@@ -139,13 +133,7 @@ public class ItemDAO
             MySqlDataReader reader = cmd.ExecuteReader();
             if (reader.Read())
             {
-                Item item = new Item
-                {
-                    Id = reader.GetInt32("id"),
-                    Name = reader.GetString("name"),
-                    SellValue = reader.GetInt32("sell_value"),
-                    EmojiName = reader.GetString("emoji_name")
-                };
+                Item item = Item.FromSQLReader(reader);
                 connection.Close();
                 return item;
             }
@@ -156,6 +144,29 @@ public class ItemDAO
         {
             connection.Close();
             return null;
+        }
+    }
+    
+    public List<Item> GetAllItems()
+    {
+        List<Item> items = new List<Item>();
+        try
+        {
+            connection.Open();
+            MySqlCommand cmd = connection.CreateCommand();
+            cmd.CommandText = "SELECT * FROM item";
+            MySqlDataReader reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                items.Add(Item.FromSQLReader(reader));
+            }
+            connection.Close();
+            return items;
+        }
+        catch
+        {
+            connection.Close();
+            return items;
         }
     }
     

@@ -72,6 +72,15 @@ public class ItemController : Controller
         
         return itemDAO.GetItem(itemName);
     }
+    
+    [HttpGet]
+    [Route("Item/GetAll")]
+    public List<Item> GetAllItems()
+    {
+        itemDAO = new ItemDAO();
+        
+        return itemDAO.GetAllItems();
+    }
 
     [HttpGet]
     [Route("Item/Exists/{itemName}")]
