@@ -9,6 +9,7 @@ public class Player
     public int ExplorationEXP { get; set; }
     public int ExplorationLVL { get; set; }
     public int AreaId { get; set; }
+    public int Money { get; set; }
 
     public static Player FromJson(string createResponse)
     {

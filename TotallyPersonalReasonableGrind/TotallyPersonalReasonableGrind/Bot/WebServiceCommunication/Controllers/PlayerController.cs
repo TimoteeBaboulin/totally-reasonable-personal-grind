@@ -64,6 +64,28 @@ public class PlayerController : Controller
             ? new HttpResponseMessage(HttpStatusCode.OK)
             : new HttpResponseMessage(HttpStatusCode.InternalServerError);
     }
+    
+    [HttpPut]
+    [Route("Player/Update/Area/{playerName}/{areaId}")]
+    public HttpResponseMessage UpdatePlayerArea(string playerName, int areaId)
+    {
+        _playerDAO = new PlayerDAO();
+        
+        return _playerDAO.UpdatePlayerArea(playerName, areaId)
+            ? new HttpResponseMessage(HttpStatusCode.OK)
+            : new HttpResponseMessage(HttpStatusCode.InternalServerError);
+    }
+    
+    [HttpPut]
+    [Route("Player/Update/Money/{playerName}/{money}")]
+    public HttpResponseMessage UpdatePlayerMoney(string playerName, int money)
+    {
+        _playerDAO = new PlayerDAO();
+        
+        return _playerDAO.UpdatePlayerMoney(playerName, money)
+            ? new HttpResponseMessage(HttpStatusCode.OK)
+            : new HttpResponseMessage(HttpStatusCode.InternalServerError);
+    }
 
     [HttpGet]
     [Route("Player/Get/{playerName}")]
@@ -81,6 +103,24 @@ public class PlayerController : Controller
         _playerDAO = new PlayerDAO();
         
         return _playerDAO.PlayerExists(playerName);
+    }
+    
+    [HttpGet]
+    [Route("Player/GetIdByName/{playerName}")]
+    public int GetPlayerIdByName(string playerName)
+    {
+        _playerDAO = new PlayerDAO();
+        
+        return _playerDAO.GetPlayerIdFromName(playerName);
+    }
+    
+    [HttpGet]
+    [Route("Player/GetNameById/{playerId}")]
+    public string GetPlayerNameById(int playerId)
+    {
+        _playerDAO = new PlayerDAO();
+        
+        return _playerDAO.GetPlayerNameFromId(playerId);
     }
 
     [HttpDelete]

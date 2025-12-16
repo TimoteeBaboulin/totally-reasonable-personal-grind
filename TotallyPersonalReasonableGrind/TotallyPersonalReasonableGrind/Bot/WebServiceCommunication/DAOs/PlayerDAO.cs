@@ -21,8 +21,8 @@ public class PlayerDAO
         {
             connection.Open();
             MySqlCommand cmd = connection.CreateCommand();
-            cmd.CommandText = "INSERT INTO player (name, combat_exp, combat_lvl, exploration_exp, exploration_lvl, area_id)" +
-                              "VALUES (@name, 0, 0, 0, 0, 1)";
+            cmd.CommandText = "INSERT INTO player (name, combat_exp, combat_lvl, exploration_exp, exploration_lvl, area_id, money)" +
+                              "VALUES (@name, 0, 0, 0, 0, 1, 0)";
             cmd.Parameters.AddWithValue("@name", playerName);
             int rowsAffected = cmd.ExecuteNonQuery();
             connection.Close();
@@ -115,15 +115,34 @@ public class PlayerDAO
         }
     }
 
-    public bool UpdatePlayerArea(string playerName, string areaName)
+    public bool UpdatePlayerArea(string playerName, int areaId)
     {
         try
         {
             connection.Open();
             MySqlCommand cmd = connection.CreateCommand();
-            cmd.CommandText = "UPDATE player SET area_id = (SELECT id FROM area WHERE name = @areaName)" +
-                              "WHERE name = @name";
-            cmd.Parameters.AddWithValue("@areaName", areaName);
+            cmd.CommandText = "UPDATE player SET area_id = @areaId WHERE name = @name";
+            cmd.Parameters.AddWithValue("@areaId", areaId);
+            cmd.Parameters.AddWithValue("@name", playerName);
+            int rowsAffected = cmd.ExecuteNonQuery();
+            connection.Close();
+            return rowsAffected > 0;
+        }
+        catch
+        {
+            connection.Close();
+            return false;
+        }
+    }
+    
+    public bool UpdatePlayerMoney(string playerName, int money)
+    {
+        try
+        {
+            connection.Open();
+            MySqlCommand cmd = connection.CreateCommand();
+            cmd.CommandText = "UPDATE player SET money = @money WHERE name = @name";
+            cmd.Parameters.AddWithValue("@money", money);
             cmd.Parameters.AddWithValue("@name", playerName);
             int rowsAffected = cmd.ExecuteNonQuery();
             connection.Close();
@@ -155,7 +174,8 @@ public class PlayerDAO
                     CombatLVL = reader.GetInt32("combat_lvl"),
                     ExplorationEXP = reader.GetInt32("exploration_exp"),
                     ExplorationLVL = reader.GetInt32("exploration_lvl"),
-                    AreaId = reader.GetInt32("area_id")
+                    AreaId = reader.GetInt32("area_id"),
+                    Money = reader.GetInt32("money")
                 };
                 connection.Close();
                 return player;
@@ -186,6 +206,54 @@ public class PlayerDAO
         {
             connection.Close();
             return false;
+        }
+    }
+    
+    public int GetPlayerIdFromName(string playerName)
+    {
+        try
+        {
+            connection.Open();
+            MySqlCommand cmd = connection.CreateCommand();
+            cmd.CommandText = "SELECT id FROM player WHERE name = @name";
+            cmd.Parameters.AddWithValue("@name", playerName);
+            MySqlDataReader reader = cmd.ExecuteReader();
+            int playerId = -1;
+            if (reader.Read())
+            {
+                playerId = reader.GetInt32("id");
+            }
+            connection.Close();
+            return playerId;
+        }
+        catch
+        {
+            connection.Close();
+            return -1;
+        }
+    }
+    
+    public string GetPlayerNameFromId(int playerId)
+    {
+        try
+        {
+            connection.Open();
+            MySqlCommand cmd = connection.CreateCommand();
+            cmd.CommandText = "SELECT name FROM player WHERE id = @id";
+            cmd.Parameters.AddWithValue("@id", playerId);
+            MySqlDataReader reader = cmd.ExecuteReader();
+            string playerName = string.Empty;
+            if (reader.Read())
+            {
+                playerName = reader.GetString("name");
+            }
+            connection.Close();
+            return playerName;
+        }
+        catch
+        {
+            connection.Close();
+            return string.Empty;
         }
     }
     
