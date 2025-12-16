@@ -24,4 +24,29 @@ public class InventoryAccess
         int newQuantity = int.Parse(inventoryQuantity) + quantity;
         await HttpClient.Client.SendToWebServiceAsync($"Inventory/Update/Quantity/{playerName}/{itemName}/{newQuantity}", HttpVerb.PUT, null);
     }
+    
+    public static async Task<bool> RemoveItemFromInventory(string playerName, string itemName, int quantity)
+    {
+        string inventoryQuantity = await HttpClient.Client.SendToWebServiceAsync($"Inventory/Get/Quantity/{playerName}/{itemName}", HttpVerb.GET, null);
+        int currentQuantity = int.Parse(inventoryQuantity);
+        if (currentQuantity < quantity)
+        {
+            return false; // Not enough items to remove
+        }
+        int newQuantity = currentQuantity - quantity;
+        if (newQuantity == 0)
+        {
+            await HttpClient.Client.SendToWebServiceAsync($"Inventory/Delete/Single/{playerName}/{itemName}", HttpVerb.DELETE, null);
+        }
+        else
+        {
+            await HttpClient.Client.SendToWebServiceAsync($"Inventory/Update/Quantity/{playerName}/{itemName}/{newQuantity}", HttpVerb.PUT, null);
+        }
+        return true;
+    }
+    
+    public static async Task ClearInventory(string playerName)
+    {
+        await HttpClient.Client.SendToWebServiceAsync($"Inventory/Delete/Clear/{playerName}", HttpVerb.DELETE, null);
+    }
 }
