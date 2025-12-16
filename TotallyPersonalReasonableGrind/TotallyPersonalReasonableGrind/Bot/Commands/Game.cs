@@ -180,7 +180,11 @@ public class Game : ICommand
     
     Loot GetRandomLoot(LootType _itemType)
     {
-        Loot[] loots = GetLootFromArea(_itemType);
+        Player player = PlayerAccess.GetOrCreatePlayer(m_player.Name).Result;
+        int requiredLevel = _itemType == LootType.Walk ? player.ExplorationLVL : player.CombatLVL;
+        Loot[] loots = GetLootFromArea(_itemType)
+            .Where((loot) => loot.RequiredLevel <= requiredLevel)
+            .ToArray();
         int totalWeight = 0;
         foreach (var loot in loots)
         {
