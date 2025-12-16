@@ -118,18 +118,17 @@ public class InventoryDAO
             connection.Open();
             MySqlCommand cmd = connection.CreateCommand();
             cmd.CommandText = "SELECT inventory.id, inventory.player_id, inventory.item_id, inventory.quantity " +
-                              "FROM inventory INNER JOIN player ON inventory.player_id = player.id " +
-                              "WHERE player.name = @playerName";
+                              "FROM inventory WHERE inventory.player_id = (SELECT id FROM player WHERE name = @playerName)";
             cmd.Parameters.AddWithValue("@playerName", playerName);
             MySqlDataReader reader = cmd.ExecuteReader();
             while (reader.Read())
             {
                 Inventory inventory = new Inventory
                 {
-                    Id = reader.GetInt32("inventory.id"),
-                    PlayerId = reader.GetInt32("inventory.player_id"),
-                    ItemId = reader.GetInt32("inventory.item_id"),
-                    Quantity = reader.GetInt32("inventory.quantity")
+                    Id = reader.GetInt32("id"),
+                    PlayerId = reader.GetInt32("player_id"),
+                    ItemId = reader.GetInt32("item_id"),
+                    Quantity = reader.GetInt32("quantity")
                 };
                 inventorySlots.Add(inventory);
             }

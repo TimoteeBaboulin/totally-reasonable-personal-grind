@@ -27,7 +27,7 @@ public class Loot
     public LootRarity Rarity { get; set; }
     public int RequiredLevel { get; set; }
     
-    public static Loot FromJson(string createResponse)
+    public static Loot? FromJson(string createResponse)
     {
         var settings = new Newtonsoft.Json.JsonSerializerSettings
         {
@@ -37,5 +37,17 @@ public class Loot
             }
         };
         return Newtonsoft.Json.JsonConvert.DeserializeObject<Loot>(createResponse, settings);
+    }
+    
+    public static List<Loot> FromJsonList(string createResponse)
+    {
+        var settings = new Newtonsoft.Json.JsonSerializerSettings
+        {
+            Converters = new List<Newtonsoft.Json.JsonConverter>
+            {
+                new Newtonsoft.Json.Converters.StringEnumConverter()
+            }
+        };
+        return Newtonsoft.Json.JsonConvert.DeserializeObject<List<Loot>>(createResponse, settings);
     }
 }

@@ -10,13 +10,7 @@ public class InventoryAccess
     public static async Task<List<Inventory>> GetInventoryData(string playerName)
     {
         string dataJson = await HttpClient.Client.SendToWebServiceAsync($"Inventory/Get/All/{playerName}", HttpVerb.GET, null);
-        List<Inventory> inventoryList = new();
-        foreach (var inventoryJson in System.Text.Json.JsonDocument.Parse(dataJson).RootElement.EnumerateArray())
-        {
-            inventoryList.Add(Inventory.FromJson(inventoryJson.GetRawText()));
-        }
-
-        return inventoryList;
+        return Inventory.FromJsonList(dataJson);
     }
     
     public static async Task AddItemToInventory(string playerName, string itemName, int quantity)
