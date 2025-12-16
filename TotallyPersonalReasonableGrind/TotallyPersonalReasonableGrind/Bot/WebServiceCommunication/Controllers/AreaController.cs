@@ -60,6 +60,15 @@ public class AreaController : Controller
         
         return areaDAO.GetAreaByName(areaName);
     }
+    
+    [HttpGet]
+    [Route("Area/GetAll")]
+    public List<Area> GetAllAreas()
+    {
+        areaDAO = new AreaDAO();
+        
+        return areaDAO.GetAllAreas();
+    }
 
     [HttpGet]
     [Route("Area/Exists/{areaName}")]

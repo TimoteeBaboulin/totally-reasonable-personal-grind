@@ -60,10 +60,10 @@ public class PlayerAccess
         return leveledUp;
     }
     
-    public static async Task UpdatePlayerMoney(string playerName, int amount)
+    public static async Task UpdatePlayerMoney(string playerName, int amountToAdd)
     {
         Player player = await GetOrCreatePlayer(playerName);
-        player.Money += amount;
+        player.Money += amountToAdd;
         await HttpClient.Client.SendToWebServiceAsync($"Player/Update/Money/{playerName}/{player.Money}", HttpVerb.PUT, null);
     }
     
@@ -71,5 +71,23 @@ public class PlayerAccess
     {
         Player player = await GetOrCreatePlayer(playerName);
         return (int)Math.Floor((player.CombatLVL + player.ExplorationLVL) / 2f);
+    }
+
+    public static async Task<int> GetPlayerMoney(string playerName)
+    {
+        Player player = await GetOrCreatePlayer(playerName);
+        return player.Money;
+    }
+    
+    public static async Task<int> GetPlayerCombatLevel(string playerName)
+    {
+        Player player = await GetOrCreatePlayer(playerName);
+        return player.CombatLVL;
+    }
+    
+    public static async Task<int> GetPlayerExplorationLevel(string playerName)
+    {
+        Player player = await GetOrCreatePlayer(playerName);
+        return player.ExplorationLVL;
     }
 }

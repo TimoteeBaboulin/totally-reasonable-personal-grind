@@ -82,18 +82,13 @@ public class AreaDAO
         {
             connection.Open();
             MySqlCommand cmd = connection.CreateCommand();
-            cmd.CommandText = "SELECT id, name, required_lvl FROM area WHERE id = @id";
+            cmd.CommandText = "SELECT area.* FROM area WHERE id = @id";
             cmd.Parameters.AddWithValue("@id", areaId);
             MySqlDataReader reader = cmd.ExecuteReader();
             Area? area = null;
             if (reader.Read())
             {
-                area = new Area
-                {
-                    Id = reader.GetInt32("id"),
-                    Name = reader.GetString("name"),
-                    RequiredLVL = reader.GetInt32("required_lvl")
-                };
+                area = Area.FromSQLReader(reader);
             }
             connection.Close();
             return area;
@@ -111,18 +106,13 @@ public class AreaDAO
         {
             connection.Open();
             MySqlCommand cmd = connection.CreateCommand();
-            cmd.CommandText = "SELECT id, name, required_lvl FROM area WHERE name = @name";
+            cmd.CommandText = "SELECT area.* FROM area WHERE name = @name";
             cmd.Parameters.AddWithValue("@name", areaName);
             MySqlDataReader reader = cmd.ExecuteReader();
             Area? area = null;
             if (reader.Read())
             {
-                area = new Area
-                {
-                    Id = reader.GetInt32("id"),
-                    Name = reader.GetString("name"),
-                    RequiredLVL = reader.GetInt32("required_lvl")
-                };
+                area = Area.FromSQLReader(reader);
             }
             connection.Close();
             return area;
@@ -131,6 +121,30 @@ public class AreaDAO
         {
             connection.Close();
             return null;
+        }
+    }
+    
+    public List<Area> GetAllAreas()
+    {
+        List<Area> areas = new List<Area>();
+        try
+        {
+            connection.Open();
+            MySqlCommand cmd = connection.CreateCommand();
+            cmd.CommandText = "SELECT area.* FROM area";
+            MySqlDataReader reader = cmd.ExecuteReader();
+            while (reader.Read())
+            {
+                Area area = Area.FromSQLReader(reader);
+                areas.Add(area);
+            }
+            connection.Close();
+            return areas;
+        }
+        catch
+        {
+            connection.Close();
+            return areas;
         }
     }
     
