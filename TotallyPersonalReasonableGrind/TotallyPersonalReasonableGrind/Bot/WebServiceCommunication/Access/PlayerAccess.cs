@@ -53,4 +53,10 @@ public class PlayerAccess
         await HttpClient.Client.SendToWebServiceAsync($"Player/Update/ExplorationStats/EXP/{playerName}/{player.ExplorationEXP}", HttpVerb.PUT, null);
         await HttpClient.Client.SendToWebServiceAsync($"Player/Update/ExplorationStats/Level/{playerName}/{player.ExplorationLVL}", HttpVerb.PUT, null);
     }
+    
+    public static async Task<int> GetPlayerMeanLevel(string playerName)
+    {
+        Player player = await GetOrCreatePlayer(playerName);
+        return (int)Math.Floor((player.CombatLVL + player.ExplorationLVL) / 2f);
+    }
 }
