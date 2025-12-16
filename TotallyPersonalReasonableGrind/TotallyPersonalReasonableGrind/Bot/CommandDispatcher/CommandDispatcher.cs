@@ -48,6 +48,11 @@ public class CommandDispatcher
     
     public async Task OnSlashCommandExecuted(SocketSlashCommand command)
     {
+        if(command.CommandName == "ping")
+        {
+            await command.RespondAsync("Pong!");
+            return;
+        }
         command.DeferAsync();
         
         Type? commandType;

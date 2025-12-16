@@ -8,16 +8,22 @@ namespace TotallyPersonalReasonableGrind.Bot.Commands.PlayerRelated;
 
 public class LootInfoCommand : ICommand
 {
-    private class LootInfoMessageBuilder(Loot loot)
+    private class LootInfoMessageBuilder(List<Loot> loots, Item item)
     {
         public void WriteLootMessage(MessageProperties properties)
         {
-            Item item = ItemAccess.GetItemById(loot.ItemId).Result;
             EmbedBuilder embed = new();
             embed.WithTitle(item.Name + " " + Item.EmojiFromName(item));
-            embed.Fields.Add(new EmbedFieldBuilder().WithName("Area").WithValue(AreaAccess.GetAreaById(loot.AreaId).Result.Name).WithIsInline(true));
-            embed.Fields.Add(new EmbedFieldBuilder().WithName("Rarity").WithValue(loot.Rarity.ToString()).WithIsInline(true));
-            embed.Fields.Add(new EmbedFieldBuilder().WithName("Required Level").WithValue(loot.RequiredLevel).WithIsInline(true));
+            embed.Fields.Add(new EmbedFieldBuilder().WithName("Area").WithValue(AreaAccess.GetAreaById(loots[0].AreaId).Result.Name).WithIsInline(true));
+            embed.Fields.Add(new EmbedFieldBuilder().WithName("Rarity").WithValue(loots[0].Rarity.ToString()).WithIsInline(true));
+            embed.Fields.Add(new EmbedFieldBuilder().WithName("Required Level").WithValue(loots[0].RequiredLevel).WithIsInline(true));
+            loots.RemoveAt(0);
+            foreach (var loot in loots)
+            {
+                embed.Fields.Add(new EmbedFieldBuilder().WithName("-").WithValue(AreaAccess.GetAreaById(loot.AreaId).Result.Name).WithIsInline(true));
+                embed.Fields.Add(new EmbedFieldBuilder().WithName("-").WithValue(loot.Rarity.ToString()).WithIsInline(true));
+                embed.Fields.Add(new EmbedFieldBuilder().WithName("-").WithValue(loot.RequiredLevel).WithIsInline(true));
+            }
 
             properties.Embed = embed.Build();
         }
@@ -50,8 +56,8 @@ public class LootInfoCommand : ICommand
     {
         //Get Item Info
         var itemName = command.Data.Options.First().Value;
-        Loot rightLoot = LootAccess.GetLootEntriesByItemName((string)itemName).Result.First();
-        LootInfoMessageBuilder builder = new(rightLoot);
+        List<Loot> rightLoot = LootAccess.GetLootEntriesByItemName((string)itemName).Result;
+        LootInfoMessageBuilder builder = new(rightLoot, ItemAccess.GetItemById(rightLoot[0].ItemId).Result);
         
         //Display loot Info
         command.ModifyOriginalResponseAsync(builder.WriteLootMessage);
