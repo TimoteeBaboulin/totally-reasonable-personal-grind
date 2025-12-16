@@ -33,7 +33,7 @@ public class Game : ICommand
     public ulong Id { get; } = ++ICommand.Index;
 
     // Action Map--------------------------------------------------------------------------------
-    private static Dictionary<string, Func<SocketMessageComponent, bool>>? m_actionMap = null;
+    private Dictionary<string, Func<SocketMessageComponent, bool>>? m_actionMap = null;
     
     private void PopulateActionMap()
     {
@@ -81,13 +81,12 @@ public class Game : ICommand
     
     // Player Data-------------------------------------------------------------------------------
     private Player m_player;
-    private Item m_currentItem;
+    private IMessageChannel m_channel;
+    private Item? m_currentItem = null;
     private int m_currentQuantity;
     
     public Task<bool> OnSlashCommand(SocketSlashCommand command)
     {
-        command.DeferAsync();
-
         Task<Player> task = PlayerAccess.GetOrCreatePlayer(command.User.GlobalName);
         
         EmbedBuilder embed = new();
@@ -96,6 +95,7 @@ public class Game : ICommand
         command.ModifyOriginalResponseAsync(WriteInitialMessage);
         
         m_player = task.Result;
+        m_channel = command.Channel;
         
         return Task.FromResult(true);
     }
@@ -131,7 +131,15 @@ public class Game : ICommand
             EmbedBuilder embed = new();
             embed.WithTitle("Game");
             embed.WithDescription("You got loot!");
-            embed.WithColor(Color.Purple);
+            embed.WithColor(Loot.Rarity switch
+            {
+                LootRarity.Common => Color.LightGrey,
+                LootRarity.UnCommon => Color.Green,
+                LootRarity.Rare => Color.Blue,
+                LootRarity.Epic => Color.Purple,
+                LootRarity.Legendary => Color.Orange,
+                _ => Color.DarkGrey
+            });
             embed.ImageUrl = ImageLinkHelper.GetImageLink("walk");
 
             embed.Fields = fields;
@@ -150,6 +158,24 @@ public class Game : ICommand
     {
         Item item = ItemAccess.GetItemById(loot.ItemId).Result;
         InventoryAccess.AddItemToInventory(m_player.Name, item.Name, quantity).Wait();
+        bool leveledUp;
+        switch (loot.Type)
+        {
+            case LootType.Walk:
+                leveledUp = PlayerAccess.UpdatePlayerExplorationStats(m_player.Name, quantity).Result;
+                break;
+            case LootType.Hit:
+                leveledUp = PlayerAccess.UpdatePlayerCombatStats(m_player.Name, quantity).Result;
+                break;
+            default:
+                throw new InvalidDataException("Invalid loot type.");
+        }
+        if (leveledUp)
+        {
+            int newLevel = loot.Type == LootType.Walk ? m_player.ExplorationLVL + 1 : m_player.CombatLVL + 1;
+            string levelType = loot.Type == LootType.Walk ? "Exploration" : "Combat";
+            m_channel.SendMessageAsync("Congratulations " + m_player.Name + ", you leveled up your" + levelType+ " level to " + newLevel + "!");
+        }
     }
     
     Loot GetRandomLoot(LootType _itemType)
@@ -161,19 +187,19 @@ public class Game : ICommand
             switch (loot.Rarity)
             {
                 case LootRarity.Legendary:
-                    totalWeight += 10;
+                    totalWeight += 1;
                     break;
                 case LootRarity.Epic:
-                    totalWeight += 5;
+                    totalWeight += 2;
                     break;
                 case LootRarity.Rare:
                     totalWeight += 3;
                     break;
                 case LootRarity.UnCommon:
-                    totalWeight += 2;
+                    totalWeight += 5;
                     break;
                 case LootRarity.Common:
-                    totalWeight += 1;
+                    totalWeight += 10;
                     break;
                 default:
                     break;
@@ -186,11 +212,11 @@ public class Game : ICommand
         {
             int weight = loot.Rarity switch
             {
-                LootRarity.Legendary => 10,
-                LootRarity.Epic => 5,
+                LootRarity.Legendary => 1,
+                LootRarity.Epic => 2,
                 LootRarity.Rare => 3,
-                LootRarity.UnCommon => 2,
-                LootRarity.Common => 1,
+                LootRarity.UnCommon => 5,
+                LootRarity.Common => 10,
                 _ => 0
             };
             
@@ -270,12 +296,12 @@ public class Game : ICommand
     
     void RemovePlayerItem(Item item, int quantity)
     {
-        throw new NotImplementedException();
+        InventoryAccess.RemoveItemFromInventory(m_player.Name, item.Name, quantity).Wait();
     }
     
     void AddPlayerGold(int amount)
     {
-        throw new NotImplementedException();
+        PlayerAccess.UpdatePlayerMoney(m_player.Name, amount).Wait();
     }
     
     bool SellItem(Item item, int quantity, SocketMessageComponent component)
@@ -306,14 +332,17 @@ public class Game : ICommand
     
     MessageComponent GetInventoryComponents(Inventory[] inventories)
     {
+        ComponentBuilder builder = new ComponentBuilder();
+        
         SelectMenuBuilder selectMenuBuilder = new();
         selectMenuBuilder.WithCustomId(Id + "|sell_item")
             .WithPlaceholder("Select an item to sell")
             .WithType(ComponentType.SelectMenu);
+        
         foreach (var inventory in inventories)
         {
             Item item = ItemAccess.GetItemById(inventory.ItemId).Result;
-            selectMenuBuilder.AddOption(item.Name + " x" + inventory.Quantity, inventory.ItemId.ToString());
+            selectMenuBuilder.AddOption(item.Name + " x" + inventory.Quantity, inventory.ItemId.ToString(), isDefault: item == m_currentItem);
         }
         
         TextInputBuilder textInputBuilder = new();
@@ -333,18 +362,30 @@ public class Game : ICommand
             .WithCustomId(Id + "|back")
             .WithStyle(ButtonStyle.Secondary);
         
-        ActionRowBuilder actionRowBuilder = new();
-        actionRowBuilder.AddComponent(buttonBuilder);
-        actionRowBuilder.AddComponent(backButtonBuilder);
-        actionRowBuilder.AddComponent(selectMenuBuilder);
-        actionRowBuilder.AddComponent(textInputBuilder);
+        builder.WithSelectMenu(selectMenuBuilder)
+            .WithButton(buttonBuilder)
+            .WithButton(backButtonBuilder);
         
-        ComponentBuilderV2 builderV2 = new();
-        builderV2.WithActionRow(actionRowBuilder);
-        return builderV2.Build();
+        if (false)
+        {
+            Inventory[] playerInventory = GetPlayerInventory();
+            Inventory currentInventory = playerInventory.First((inv) => inv.ItemId == m_currentItem.Id);
+            
+            SelectMenuBuilder quantityMenuBuilder = new();
+            quantityMenuBuilder.WithCustomId(Id + "|sell_quantity")
+                .WithType(ComponentType.SelectMenu);
+            for (int sellQuantity = 1; sellQuantity < currentInventory.Quantity; sellQuantity++)
+            {
+                quantityMenuBuilder.AddOption(sellQuantity.ToString(), sellQuantity.ToString(), isDefault: sellQuantity == m_currentQuantity);
+            }
+            
+            builder.WithSelectMenu(quantityMenuBuilder);
+        }
+        
+        return builder.Build();
     }
     
-    private void WriteSellMessage(MessageProperties properties)
+    private void WriteInitalSellMessage(MessageProperties properties)
     {
         Inventory[] inventories = GetPlayerInventory();
         
@@ -361,8 +402,11 @@ public class Game : ICommand
     private bool OnSell(SocketMessageComponent component)
     {
         //SellItem();
+        m_currentItem = null;
+        m_currentQuantity = 1;
+        
         RestInteractionMessage msg = component.GetOriginalResponseAsync().Result;
-        msg.ModifyAsync(WriteSellMessage).Wait();
+        msg.ModifyAsync(WriteInitalSellMessage).Wait();
         return true;
     }
     
@@ -373,31 +417,38 @@ public class Game : ICommand
         
         m_currentItem = item;
         RestInteractionMessage msg = component.GetOriginalResponseAsync().Result;
-        msg.ModifyAsync(WriteSellMessage);
+        msg.ModifyAsync(WriteInitalSellMessage);
         return true;
     }
     
     private bool OnSellQuantity(SocketMessageComponent component)
     {
-        int quantity;
-        bool parseResult = int.TryParse(component.Data.Values.First(), out quantity);
+        int quantity = int.Parse(component.Data.Values.First());
         RestInteractionMessage msg = component.GetOriginalResponseAsync().Result;
         
-        if (!parseResult || quantity <= 0)
+        if (quantity <= 0)
         {
             component.RespondAsync("Invalid quantity.").Wait();
             return true;
         }
         
         m_currentQuantity = quantity;
-        msg.ModifyAsync(WriteSellMessage);
+        msg.ModifyAsync(WriteInitalSellMessage);
         return true;
     }
     
     private bool OnConfirmSell(SocketMessageComponent component)
     {
         RestInteractionMessage msg = component.GetOriginalResponseAsync().Result;
-        return SellItem(m_currentItem, m_currentQuantity, component);
+        Inventory[] inventories = GetPlayerInventory();
+        if (PlayerHasItem(m_currentItem, 1))
+        {
+            Inventory currentInventory = inventories.First((inv) => inv.ItemId == m_currentItem.Id);
+            return SellItem(m_currentItem, currentInventory.Quantity, component);
+        }
+        
+        component.RespondAsync("You don't have that item.").Wait();
+        return true;
     }
     
     private bool OnSellBack(SocketMessageComponent component)
@@ -414,6 +465,7 @@ public class Game : ICommand
         RestInteractionMessage msg = component.GetOriginalResponseAsync().Result;
         Loot loot = GetRandomLoot(LootType.Hit);
         LootMessageBuilder lootMessageBuilder = new(loot);
+        AddLootToPlayerInventory(loot, loot.Quantity);
         
         msg.ModifyAsync(lootMessageBuilder.WriteLootMessage).Wait();
         return true;

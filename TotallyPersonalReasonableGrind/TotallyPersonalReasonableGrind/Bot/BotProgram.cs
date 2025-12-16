@@ -1,3 +1,4 @@
+using System;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using Discord;
@@ -30,6 +31,10 @@ public class BotProgram
         m_client.SlashCommandExecuted += m_commandDispatcher.OnSlashCommandExecuted;
         m_client.ButtonExecuted += m_commandDispatcher.OnComponentExecuted;
         m_client.SelectMenuExecuted += m_commandDispatcher.OnComponentExecuted;
+        m_client.Log += async (LogMessage msg) =>
+        {
+            Console.WriteLine(msg.ToString());
+        };
         
         await m_client.LoginAsync(TokenType.Bot, "");
         await m_client.StartAsync();
