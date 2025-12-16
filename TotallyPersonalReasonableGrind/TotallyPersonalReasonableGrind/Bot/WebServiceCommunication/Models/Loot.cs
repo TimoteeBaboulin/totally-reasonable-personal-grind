@@ -56,13 +56,13 @@ public class Loot
     {
         Loot loot = new Loot
         {
-            Id = reader.GetInt32("Id"),
-            ItemId = reader.GetInt32("ItemId"),
-            AreaId = reader.GetInt32("AreaId"),
-            Quantity = reader.GetInt32("Quantity"),
-            Type = Enum.Parse<LootType>(reader.GetString("Type")),
-            Rarity = Enum.Parse<LootRarity>(reader.GetString("Rarity")),
-            RequiredLevel = reader.GetInt32("RequiredLevel")
+            Id = reader.GetInt32("id"),
+            ItemId = reader.GetInt32("item_id"),
+            AreaId = reader.GetInt32("area_id"),
+            Quantity = reader.GetInt32("quantity"),
+            Type = Enum.Parse<LootType>(reader.GetString("type")),
+            Rarity = Enum.Parse<LootRarity>(reader.GetString("rarity")),
+            RequiredLevel = reader.GetInt32("required_lvl")
         };
         return loot;
     }
