@@ -16,6 +16,7 @@ public class InventoryCommand : ICommand
         {
             EmbedBuilder embed = new();
             embed.WithTitle("Inventory");
+            if(inventories.Count == 0) embed.WithDescription("You have no items in your inventory.");
             foreach (var current in inventories)
             {
                 if (current.Quantity == 0) continue;
