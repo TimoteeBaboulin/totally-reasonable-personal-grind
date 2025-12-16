@@ -28,30 +28,36 @@ public class PlayerAccess
         throw new Exception("Failed to create player.");
     }
 
-    public static async Task UpdatePlayerCombatStats(string playerName, int expGained)
+    public static async Task<bool> UpdatePlayerCombatStats(string playerName, int expGained)
     {
         Player player = await GetOrCreatePlayer(playerName);
         player.CombatEXP += expGained;
+        bool leveledUp = false;
         if (player.CombatEXP >= (player.CombatLVL + 1) * 100)
         {
             player.CombatEXP -= (player.CombatLVL + 1) * 100;
             ++player.CombatLVL;
+            leveledUp = true;
         }
         await HttpClient.Client.SendToWebServiceAsync($"Player/Update/CombatStats/EXP/{playerName}/{player.CombatEXP}", HttpVerb.PUT, null);
         await HttpClient.Client.SendToWebServiceAsync($"Player/Update/CombatStats/Level/{playerName}/{player.CombatLVL}", HttpVerb.PUT, null);
+        return leveledUp;
     }
     
-    public static async Task UpdatePlayerExplorationStats(string playerName, int expGained)
+    public static async Task<bool> UpdatePlayerExplorationStats(string playerName, int expGained)
     {
         Player player = await GetOrCreatePlayer(playerName);
         player.ExplorationEXP += expGained;
+        bool leveledUp = false;
         if (player.ExplorationEXP >= (player.ExplorationLVL + 1) * 100)
         {
             player.ExplorationEXP -= (player.ExplorationLVL + 1) * 100;
             ++player.ExplorationLVL;
+            leveledUp = true;
         }
         await HttpClient.Client.SendToWebServiceAsync($"Player/Update/ExplorationStats/EXP/{playerName}/{player.ExplorationEXP}", HttpVerb.PUT, null);
         await HttpClient.Client.SendToWebServiceAsync($"Player/Update/ExplorationStats/Level/{playerName}/{player.ExplorationLVL}", HttpVerb.PUT, null);
+        return leveledUp;
     }
     
     public static async Task<int> GetPlayerMeanLevel(string playerName)
