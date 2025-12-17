@@ -109,7 +109,7 @@ public class ItemDAO
             MySqlDataReader reader = cmd.ExecuteReader();
             if (reader.Read())
             {
-                Item item = Item.FromSQLReader(reader);
+                Item item = Item.FromSqlReader(reader);
                 connection.Close();
                 return item;
             }
@@ -134,7 +134,7 @@ public class ItemDAO
             MySqlDataReader reader = cmd.ExecuteReader();
             if (reader.Read())
             {
-                Item item = Item.FromSQLReader(reader);
+                Item item = Item.FromSqlReader(reader);
                 connection.Close();
                 return item;
             }
@@ -159,7 +159,7 @@ public class ItemDAO
             MySqlDataReader reader = cmd.ExecuteReader();
             while (reader.Read())
             {
-                items.Add(Item.FromSQLReader(reader));
+                items.Add(Item.FromSqlReader(reader));
             }
             connection.Close();
             return items;

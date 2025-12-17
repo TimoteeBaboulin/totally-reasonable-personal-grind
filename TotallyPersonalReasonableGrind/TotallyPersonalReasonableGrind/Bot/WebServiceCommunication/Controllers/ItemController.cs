@@ -12,8 +12,7 @@ public class ItemController : Controller
 {
     private ItemDAO itemDAO;
 
-    [HttpPost]
-    [Route("Item/Create/{itemName}/{sellValue}")]
+    [HttpPost] [Route("Item/Create/{itemName}/{sellValue}")]
     public HttpResponseMessage CreateItem(string itemName, int sellValue)
     {
         itemDAO = new ItemDAO();
@@ -23,8 +22,7 @@ public class ItemController : Controller
             : new HttpResponseMessage(HttpStatusCode.InternalServerError);
     }
 
-    [HttpPut]
-    [Route("Item/Update/SellValue/{itemName}/{sellValue}")]
+    [HttpPut] [Route("Item/Update/SellValue/{itemName}/{sellValue}")]
     public HttpResponseMessage UpdateItemSellValue(string itemName, int sellValue)
     {
         itemDAO = new ItemDAO();
@@ -34,8 +32,7 @@ public class ItemController : Controller
             : new HttpResponseMessage(HttpStatusCode.InternalServerError);
     }
     
-    [HttpPut]
-    [Route("Item/Update/ItemName/{itemName}/{newName}")]
+    [HttpPut] [Route("Item/Update/ItemName/{itemName}/{newName}")]
     public HttpResponseMessage UpdateItemName(string itemName, string newName)
     {
         itemDAO = new ItemDAO();
@@ -45,8 +42,7 @@ public class ItemController : Controller
             : new HttpResponseMessage(HttpStatusCode.InternalServerError);
     }
 
-    [HttpPut]
-    [Route("Item/Update/EmojiName/{itemName}/{emojiName}")]
+    [HttpPut] [Route("Item/Update/EmojiName/{itemName}/{emojiName}")]
     public HttpResponseMessage UpdateEmojiName(string itemName, string emojiName)
     {
         itemDAO = new ItemDAO();
@@ -56,8 +52,7 @@ public class ItemController : Controller
             : new HttpResponseMessage(HttpStatusCode.InternalServerError);
     }
 
-    [HttpGet]
-    [Route("Item/GetById/{itemId}")]
+    [HttpGet] [Route("Item/GetById/{itemId}")]
     public Item? GetItemById(int itemId)
     {
         itemDAO = new ItemDAO();
@@ -65,8 +60,7 @@ public class ItemController : Controller
         return itemDAO.GetItemById(itemId);
     }
     
-    [HttpGet]
-    [Route("Item/Get/{itemName}")]
+    [HttpGet] [Route("Item/Get/{itemName}")]
     public Item? GetItem(string itemName)
     {
         itemDAO = new ItemDAO();
@@ -74,8 +68,7 @@ public class ItemController : Controller
         return itemDAO.GetItem(itemName);
     }
     
-    [HttpGet]
-    [Route("Item/GetAll")]
+    [HttpGet] [Route("Item/GetAll")]
     public List<Item> GetAllItems()
     {
         itemDAO = new ItemDAO();
@@ -83,8 +76,7 @@ public class ItemController : Controller
         return itemDAO.GetAllItems();
     }
 
-    [HttpGet]
-    [Route("Item/Exists/{itemName}")]
+    [HttpGet] [Route("Item/Exists/{itemName}")]
     public bool ItemExists(string itemName)
     {
         itemDAO = new ItemDAO();
@@ -92,8 +84,7 @@ public class ItemController : Controller
         return itemDAO.ItemExists(itemName);
     }
 
-    [HttpDelete]
-    [Route("Item/Delete/{itemName}")]
+    [HttpDelete] [Route("Item/Delete/{itemName}")]
     public HttpResponseMessage DeleteItem(string itemName)
     {
         itemDAO = new ItemDAO();

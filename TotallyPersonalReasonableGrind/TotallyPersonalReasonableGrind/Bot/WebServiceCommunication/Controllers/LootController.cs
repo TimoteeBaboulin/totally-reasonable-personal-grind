@@ -12,8 +12,7 @@ public class LootController : Controller
 {
     private LootDAO lootDAO;
 
-    [HttpPost]
-    [Route("Loot/Create/{itemName}/{areaName}/{quantity}/{lootType}/{lootRarity}/{requiredLevel}")]
+    [HttpPost] [Route("Loot/Create/{itemName}/{areaName}/{quantity}/{lootType}/{lootRarity}/{requiredLevel}")]
     public HttpResponseMessage CreateLootEntry(string itemName, string areaName, int quantity, string lootType,
         string lootRarity, int requiredLevel)
     {
@@ -27,8 +26,7 @@ public class LootController : Controller
             : new HttpResponseMessage(HttpStatusCode.InternalServerError);
     }
 
-    [HttpPut]
-    [Route("Loot/Update/{itemName}/{areaName}/{quantity}")]
+    [HttpPut] [Route("Loot/Update/{itemName}/{areaName}/{quantity}")]
     public HttpResponseMessage UpdateLootQuantity(string itemName, string areaName, int quantity)
     {
         lootDAO = new LootDAO();
@@ -38,8 +36,7 @@ public class LootController : Controller
             : new HttpResponseMessage(HttpStatusCode.InternalServerError);
     }
     
-    [HttpPut]
-    [Route("Loot/Update/Type/{itemName}/{areaName}/{lootType}")]
+    [HttpPut] [Route("Loot/Update/Type/{itemName}/{areaName}/{lootType}")]
     public HttpResponseMessage UpdateLootType(string itemName, string areaName, string lootType)
     {
         lootDAO = new LootDAO();
@@ -50,8 +47,7 @@ public class LootController : Controller
             : new HttpResponseMessage(HttpStatusCode.InternalServerError);
     }
 
-    [HttpPut]
-    [Route("Loot/Update/Rarity/{itemName}/{areaName}/{lootRarity}")]
+    [HttpPut] [Route("Loot/Update/Rarity/{itemName}/{areaName}/{lootRarity}")]
     public HttpResponseMessage UpdateLootRarity(string itemName, string areaName, string lootRarity)
     {
         lootDAO = new LootDAO();
@@ -62,8 +58,7 @@ public class LootController : Controller
             : new HttpResponseMessage(HttpStatusCode.InternalServerError);
     }
     
-    [HttpPut]
-    [Route("Loot/Update/RequiredLevel/{itemName}/{areaName}/{requiredLevel}")]
+    [HttpPut] [Route("Loot/Update/RequiredLevel/{itemName}/{areaName}/{requiredLevel}")]
     public HttpResponseMessage UpdateLootRequiredLevel(string itemName, string areaName, int requiredLevel)
     {
         lootDAO = new LootDAO();
@@ -73,8 +68,7 @@ public class LootController : Controller
             : new HttpResponseMessage(HttpStatusCode.InternalServerError);
     }
 
-    [HttpGet]
-    [Route("Loot/Get/{itemName}/{areaName}")]
+    [HttpGet] [Route("Loot/Get/{itemName}/{areaName}")]
     public Loot? GetLootEntry(string itemName, string areaName)
     {
         lootDAO = new LootDAO();
@@ -82,8 +76,7 @@ public class LootController : Controller
         return lootDAO.GetLootEntry(itemName, areaName);
     }
 
-    [HttpGet]
-    [Route("Loot/GetAll/{areaName}")]
+    [HttpGet] [Route("Loot/GetAll/{areaName}")]
     public List<Loot> GetLootEntriesOfArea(string areaName)
     {
         lootDAO = new LootDAO();
@@ -91,8 +84,7 @@ public class LootController : Controller
         return lootDAO.GetLootEntriesOfArea(areaName);
     }
     
-    [HttpGet]
-    [Route("Loot/GetAllByItemId/{itemId}")]
+    [HttpGet] [Route("Loot/GetAllByItemId/{itemId}")]
     public List<Loot> GetLootEntriesByItemId(int itemId)
     {
         lootDAO = new LootDAO();
@@ -100,8 +92,7 @@ public class LootController : Controller
         return lootDAO.GetLootEntriesByItemId(itemId);
     }
     
-    [HttpGet]
-    [Route("Loot/GetAllByItemName/{itemName}")]
+    [HttpGet] [Route("Loot/GetAllByItemName/{itemName}")]
     public List<Loot> GetLootEntriesByItemName(string itemName)
     {
         lootDAO = new LootDAO();
@@ -109,8 +100,7 @@ public class LootController : Controller
         return lootDAO.GetLootEntriesByItemName(itemName);
     }
 
-    [HttpDelete]
-    [Route("Loot/Delete/{itemName}/{areaName}")]
+    [HttpDelete] [Route("Loot/Delete/{itemName}/{areaName}")]
     public HttpResponseMessage DeleteLootEntry(string itemName, string areaName)
     {
         lootDAO = new LootDAO();
@@ -120,8 +110,7 @@ public class LootController : Controller
             : new HttpResponseMessage(HttpStatusCode.InternalServerError);
     }
 
-    [HttpDelete]
-    [Route("Loot/DeleteAll/{areaName}")]
+    [HttpDelete] [Route("Loot/DeleteAll/{areaName}")]
     public HttpResponseMessage DeleteLootEntriesOfArea(string areaName)
     {
         lootDAO = new LootDAO();

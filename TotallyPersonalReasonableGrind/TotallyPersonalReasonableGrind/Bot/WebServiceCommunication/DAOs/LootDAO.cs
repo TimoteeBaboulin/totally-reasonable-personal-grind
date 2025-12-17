@@ -150,7 +150,7 @@ public class LootDAO
             Loot? loot = null;
             if (reader.Read())
             {
-                loot = Loot.FromSQLReader(ref reader);
+                loot = Loot.FromSqlReader(ref reader);
             }
             connection.Close();
             return loot;
@@ -176,7 +176,7 @@ public class LootDAO
             MySqlDataReader reader = cmd.ExecuteReader();
             while (reader.Read())
             {
-                loots.Add(Loot.FromSQLReader(ref reader));
+                loots.Add(Loot.FromSqlReader(ref reader));
             }
             connection.Close();
         }
@@ -200,7 +200,7 @@ public class LootDAO
             MySqlDataReader reader = cmd.ExecuteReader();
             while (reader.Read())
             {
-                loots.Add(Loot.FromSQLReader(ref reader));
+                loots.Add(Loot.FromSqlReader(ref reader));
             }
             connection.Close();
         }
@@ -225,7 +225,7 @@ public class LootDAO
             MySqlDataReader reader = cmd.ExecuteReader();
             while (reader.Read())
             {
-                loots.Add(Loot.FromSQLReader(ref reader));
+                loots.Add(Loot.FromSqlReader(ref reader));
             }
             connection.Close();
         }

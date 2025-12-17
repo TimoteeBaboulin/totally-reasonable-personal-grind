@@ -21,13 +21,13 @@ public enum LootType
 
 public class Loot
 {
-    public int Id { get; set; }
-    public int ItemId { get; set; }
-    public int AreaId { get; set; }
-    public int Quantity { get; set; }
-    public LootType Type { get; set; }
-    public LootRarity Rarity { get; set; }
-    public int RequiredLevel { get; set; }
+    public int          Id              { get; set; }
+    public int          ItemId          { get; set; }
+    public int          AreaId          { get; set; }
+    public int          Quantity        { get; set; }
+    public LootType     Type            { get; set; }
+    public LootRarity   Rarity          { get; set; }
+    public int          RequiredLevel   { get; set; }
     
     public static Loot? FromJson(string createResponse)
     {
@@ -38,6 +38,7 @@ public class Loot
                 new Newtonsoft.Json.Converters.StringEnumConverter()
             }
         };
+        
         return Newtonsoft.Json.JsonConvert.DeserializeObject<Loot>(createResponse, settings);
     }
     
@@ -50,34 +51,35 @@ public class Loot
                 new Newtonsoft.Json.Converters.StringEnumConverter()
             }
         };
-        return Newtonsoft.Json.JsonConvert.DeserializeObject<List<Loot>>(createResponse, settings);
+        
+        List<Loot>? loots = Newtonsoft.Json.JsonConvert.DeserializeObject<List<Loot>>(createResponse, settings);
+        return loots ?? [];
     }
 
-    public static Loot FromSQLReader(ref MySqlDataReader reader)
+    public static Loot FromSqlReader(ref MySqlDataReader reader)
     {
-        Loot loot = new Loot
+        return new Loot
         {
-            Id = reader.GetInt32("id"),
-            ItemId = reader.GetInt32("item_id"),
-            AreaId = reader.GetInt32("area_id"),
-            Quantity = reader.GetInt32("quantity"),
-            Type = Enum.Parse<LootType>(reader.GetString("type")),
-            Rarity = Enum.Parse<LootRarity>(reader.GetString("rarity")),
-            RequiredLevel = reader.GetInt32("required_lvl")
+            Id              = reader.GetInt32("id"),
+            ItemId          = reader.GetInt32("item_id"),
+            AreaId          = reader.GetInt32("area_id"),
+            Quantity        = reader.GetInt32("quantity"),
+            Type            = Enum.Parse<LootType>(reader.GetString("type")),
+            Rarity          = Enum.Parse<LootRarity>(reader.GetString("rarity")),
+            RequiredLevel   = reader.GetInt32("required_lvl")
         };
-        return loot;
     }
 
-    public static int GainEXP(Loot loot)
+    public static int ExpFromLootProperties(Loot loot)
     {
         return loot.Quantity * loot.Rarity switch 
         {
-            LootRarity.Common => 1,
-            LootRarity.UnCommon => 3,
-            LootRarity.Rare => 7,
-            LootRarity.Epic => 15,
-            LootRarity.Legendary => 30,
-            _ => 0
+            LootRarity.Common       => 1,
+            LootRarity.UnCommon     => 3,
+            LootRarity.Rare         => 7,
+            LootRarity.Epic         => 15,
+            LootRarity.Legendary    => 30,
+            _                       => 0
         };
     }
 }

@@ -34,8 +34,28 @@ public class PlayerDAO
             return false;
         }
     }
+
+    public bool UpdatePlayerName(string playerName, string newName)
+    {
+        try
+        {
+            connection.Open();
+            MySqlCommand cmd = connection.CreateCommand();
+            cmd.CommandText = "UPDATE player SET name = @newName WHERE name = @name";
+            cmd.Parameters.AddWithValue("@newName", newName);
+            cmd.Parameters.AddWithValue("@name", playerName);
+            int rowsAffected = cmd.ExecuteNonQuery();
+            connection.Close();
+            return rowsAffected > 0;
+        }
+        catch
+        {
+            connection.Close();
+            return false;
+        }
+    }
     
-    public bool UpdatePlayerCombatStatsEXP(string playerName, int exp)
+    public bool UpdatePlayerCombatStatsExp(string playerName, int exp)
     {
         try
         {
@@ -75,7 +95,7 @@ public class PlayerDAO
         }
     }
     
-    public bool UpdatePlayerExplorationStatsEXP(string playerName, int exp)
+    public bool UpdatePlayerExplorationStatsExp(string playerName, int exp)
     {
         try
         {
@@ -115,7 +135,7 @@ public class PlayerDAO
         }
     }
 
-    public bool UpdatePlayerArea(string playerName, int areaId)
+    public bool UpdatePlayerAreaById(string playerName, int areaId)
     {
         try
         {
@@ -123,6 +143,26 @@ public class PlayerDAO
             MySqlCommand cmd = connection.CreateCommand();
             cmd.CommandText = "UPDATE player SET area_id = @areaId WHERE name = @name";
             cmd.Parameters.AddWithValue("@areaId", areaId);
+            cmd.Parameters.AddWithValue("@name", playerName);
+            int rowsAffected = cmd.ExecuteNonQuery();
+            connection.Close();
+            return rowsAffected > 0;
+        }
+        catch
+        {
+            connection.Close();
+            return false;
+        }
+    }
+    
+    public bool UpdatePlayerAreaByName(string playerName, string areaName)
+    {
+        try
+        {
+            connection.Open();
+            MySqlCommand cmd = connection.CreateCommand();
+            cmd.CommandText = "UPDATE player SET area_id = (SELECT id FROM area WHERE name = @areaName) WHERE name = @name";
+            cmd.Parameters.AddWithValue("@areaName", areaName);
             cmd.Parameters.AddWithValue("@name", playerName);
             int rowsAffected = cmd.ExecuteNonQuery();
             connection.Close();
@@ -155,28 +195,18 @@ public class PlayerDAO
         }
     }
     
-    public Player? GetPlayer(string playerName)
+    public Player? GetPlayerFromName(string playerName)
     {
         try
         {
             connection.Open();
             MySqlCommand cmd = connection.CreateCommand();
-            cmd.CommandText = "SELECT * FROM player WHERE name = @name";
+            cmd.CommandText = "SELECT player.* FROM player WHERE name = @name";
             cmd.Parameters.AddWithValue("@name", playerName);
             MySqlDataReader reader = cmd.ExecuteReader();
             if (reader.Read())
             {
-                Player player = new Player
-                {
-                    Id = reader.GetInt32("id"),
-                    Name = reader.GetString("name"),
-                    CombatEXP = reader.GetInt32("combat_exp"),
-                    CombatLVL = reader.GetInt32("combat_lvl"),
-                    ExplorationEXP = reader.GetInt32("exploration_exp"),
-                    ExplorationLVL = reader.GetInt32("exploration_lvl"),
-                    AreaId = reader.GetInt32("area_id"),
-                    Money = reader.GetInt32("money")
-                };
+                Player player = Player.FromSqlReader(reader);
                 connection.Close();
                 return player;
             }
@@ -187,25 +217,6 @@ public class PlayerDAO
         {
             connection.Close();
             return null;
-        }
-    }
-    
-    public bool PlayerExists(string playerName)
-    {
-        try
-        {
-            connection.Open();
-            MySqlCommand cmd = connection.CreateCommand();
-            cmd.CommandText = "SELECT COUNT(*) FROM player WHERE name = @name";
-            cmd.Parameters.AddWithValue("@name", playerName);
-            int count = Convert.ToInt32(cmd.ExecuteScalar());
-            connection.Close();
-            return count > 0;
-        }
-        catch
-        {
-            connection.Close();
-            return false;
         }
     }
     
@@ -254,6 +265,169 @@ public class PlayerDAO
         {
             connection.Close();
             return string.Empty;
+        }
+    }
+
+    public int GetPlayerCombatExpFromId(int playerId)
+    {
+        try
+        {
+            connection.Open();
+            MySqlCommand cmd = connection.CreateCommand();
+            cmd.CommandText = "SELECT combat_exp FROM player WHERE id = @id";
+            cmd.Parameters.AddWithValue("@id", playerId);
+            MySqlDataReader reader = cmd.ExecuteReader();
+            int combatExp = -1;
+            if (reader.Read())
+            {
+                combatExp = reader.GetInt32("combat_exp");
+            }
+            connection.Close();
+            return combatExp;
+        }
+        catch
+        {
+            connection.Close();
+            return -1;
+        }
+    }
+
+    public int GetPlayerCombatLvlFromId(int playerId)
+    {
+        try
+        {
+            connection.Open();
+            MySqlCommand cmd = connection.CreateCommand();
+            cmd.CommandText = "SELECT combat_lvl FROM player WHERE id = @id";
+            cmd.Parameters.AddWithValue("@id", playerId);
+            MySqlDataReader reader = cmd.ExecuteReader();
+            int combatLvl = -1;
+            if (reader.Read())
+            {
+                combatLvl = reader.GetInt32("combat_lvl");
+            }
+            connection.Close();
+            return combatLvl;
+        }
+        catch
+        {
+            connection.Close();
+            return -1;
+        }
+    }
+
+    public int GetPlayerExplorationExpFromId(int playerId)
+    {
+        try
+        {
+            connection.Open();
+            MySqlCommand cmd = connection.CreateCommand();
+            cmd.CommandText = "SELECT exploration_exp FROM player WHERE id = @id";
+            cmd.Parameters.AddWithValue("@id", playerId);
+            MySqlDataReader reader = cmd.ExecuteReader();
+            int explorationExp = -1;
+            if (reader.Read())
+            {
+                explorationExp = reader.GetInt32("exploration_exp");
+            }
+            connection.Close();
+            return explorationExp;
+        }
+        catch
+        {
+            connection.Close();
+            return -1;
+        }
+    }
+    
+    public int GetPlayerExplorationLvlFromId(int playerId)
+    {
+        try
+        {
+            connection.Open();
+            MySqlCommand cmd = connection.CreateCommand();
+            cmd.CommandText = "SELECT exploration_lvl FROM player WHERE id = @id";
+            cmd.Parameters.AddWithValue("@id", playerId);
+            MySqlDataReader reader = cmd.ExecuteReader();
+            int explorationLvl = -1;
+            if (reader.Read())
+            {
+                explorationLvl = reader.GetInt32("exploration_lvl");
+            }
+            connection.Close();
+            return explorationLvl;
+        }
+        catch
+        {
+            connection.Close();
+            return -1;
+        }
+    }
+    
+    public int GetPlayerAreaFromId(int playerId)
+    {
+        try
+        {
+            connection.Open();
+            MySqlCommand cmd = connection.CreateCommand();
+            cmd.CommandText = "SELECT area_id FROM player WHERE id = @id";
+            cmd.Parameters.AddWithValue("@id", playerId);
+            MySqlDataReader reader = cmd.ExecuteReader();
+            int areaId = -1;
+            if (reader.Read())
+            {
+                areaId = reader.GetInt32("area_id");
+            }
+            connection.Close();
+            return areaId;
+        }
+        catch
+        {
+            connection.Close();
+            return -1;
+        }
+    }
+    
+    public int GetPlayerMoneyFromId(int playerId)
+    {
+        try
+        {
+            connection.Open();
+            MySqlCommand cmd = connection.CreateCommand();
+            cmd.CommandText = "SELECT money FROM player WHERE id = @id";
+            cmd.Parameters.AddWithValue("@id", playerId);
+            MySqlDataReader reader = cmd.ExecuteReader();
+            int money = -1;
+            if (reader.Read())
+            {
+                money = reader.GetInt32("money");
+            }
+            connection.Close();
+            return money;
+        }
+        catch
+        {
+            connection.Close();
+            return -1;
+        }
+    }
+    
+    public bool PlayerExists(string playerName)
+    {
+        try
+        {
+            connection.Open();
+            MySqlCommand cmd = connection.CreateCommand();
+            cmd.CommandText = "SELECT COUNT(*) FROM player WHERE name = @name";
+            cmd.Parameters.AddWithValue("@name", playerName);
+            int count = Convert.ToInt32(cmd.ExecuteScalar());
+            connection.Close();
+            return count > 0;
+        }
+        catch
+        {
+            connection.Close();
+            return false;
         }
     }
     

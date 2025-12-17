@@ -8,7 +8,12 @@ public class AreaAccess
     public static async Task<Area> GetAreaById(int areaId)
     {
         string areaData = await HttpClient.Client.SendToWebServiceAsync($"Area/GetById/{areaId}", HttpVerb.GET, null);
-        return Area.FromJson(areaData);
+        Area? area = Area.FromJson(areaData);
+        if (area == null)
+        {
+            throw new Exception($"Area with ID {areaId} not found.");
+        }
+        return area;
     }
 
     public static async Task<List<Area>> GetAllAreas()

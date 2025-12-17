@@ -172,7 +172,7 @@ public class Game : ICommand
         }
         if (leveledUp)
         {
-            int newLevel = loot.Type == LootType.Walk ? m_player.ExplorationLVL + 1 : m_player.CombatLVL + 1;
+            int newLevel = loot.Type == LootType.Walk ? m_player.ExplorationLvl + 1 : m_player.CombatLvl + 1;
             string levelType = loot.Type == LootType.Walk ? "Exploration" : "Combat";
             m_channel.SendMessageAsync("Congratulations " + m_player.Name + ", you leveled up your" + levelType+ " level to " + newLevel + "!");
         }
@@ -181,7 +181,7 @@ public class Game : ICommand
     Loot GetRandomLoot(LootType _itemType)
     {
         Player player = PlayerAccess.GetOrCreatePlayer(m_player.Name).Result;
-        int requiredLevel = _itemType == LootType.Walk ? player.ExplorationLVL : player.CombatLVL;
+        int requiredLevel = _itemType == LootType.Walk ? player.ExplorationLvl : player.CombatLvl;
         Loot[] loots = GetLootFromArea(_itemType)
             .Where((loot) => loot.RequiredLevel <= requiredLevel)
             .ToArray();

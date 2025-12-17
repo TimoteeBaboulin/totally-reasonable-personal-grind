@@ -15,11 +15,11 @@ public class PlayerInfo : ICommand
         {
             EmbedBuilder embed = new();
             embed.WithTitle("Player Info");
-            embed.Fields.Add(new EmbedFieldBuilder().WithName("Combat Xp").WithValue(player.CombatEXP).WithIsInline(true));
-            embed.Fields.Add(new EmbedFieldBuilder().WithName("Combat LvL").WithValue(player.CombatLVL).WithIsInline(true));
+            embed.Fields.Add(new EmbedFieldBuilder().WithName("Combat Xp").WithValue(player.CombatExp).WithIsInline(true));
+            embed.Fields.Add(new EmbedFieldBuilder().WithName("Combat LvL").WithValue(player.CombatLvl).WithIsInline(true));
             embed.Fields.Add(new EmbedFieldBuilder().WithName("ㅤ").WithValue("ㅤ").WithIsInline(true));
-            embed.Fields.Add(new EmbedFieldBuilder().WithName("Exploration Xp").WithValue(player.ExplorationEXP).WithIsInline(true));
-            embed.Fields.Add(new EmbedFieldBuilder().WithName("Exploration LvL").WithValue(player.ExplorationLVL).WithIsInline(true));
+            embed.Fields.Add(new EmbedFieldBuilder().WithName("Exploration Xp").WithValue(player.ExplorationExp).WithIsInline(true));
+            embed.Fields.Add(new EmbedFieldBuilder().WithName("Exploration LvL").WithValue(player.ExplorationLvl).WithIsInline(true));
             embed.Fields.Add(new EmbedFieldBuilder().WithName("ㅤ").WithValue("ㅤ").WithIsInline(true));
             embed.Fields.Add(new EmbedFieldBuilder().WithName("Money").WithValue(player.Money).WithIsInline(true));
             

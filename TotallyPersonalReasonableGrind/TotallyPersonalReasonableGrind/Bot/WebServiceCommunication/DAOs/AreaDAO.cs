@@ -88,7 +88,7 @@ public class AreaDAO
             Area? area = null;
             if (reader.Read())
             {
-                area = Area.FromSQLReader(reader);
+                area = Area.FromSqlReader(reader);
             }
             connection.Close();
             return area;
@@ -112,7 +112,7 @@ public class AreaDAO
             Area? area = null;
             if (reader.Read())
             {
-                area = Area.FromSQLReader(reader);
+                area = Area.FromSqlReader(reader);
             }
             connection.Close();
             return area;
@@ -135,7 +135,7 @@ public class AreaDAO
             MySqlDataReader reader = cmd.ExecuteReader();
             while (reader.Read())
             {
-                Area area = Area.FromSQLReader(reader);
+                Area area = Area.FromSqlReader(reader);
                 areas.Add(area);
             }
             connection.Close();

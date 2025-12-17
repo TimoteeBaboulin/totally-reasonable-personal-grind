@@ -11,8 +11,7 @@ public class InventoryController : Controller
 {
     private InventoryDAO inventoryDAO;
     
-    [HttpPost]
-    [Route("Inventory/Create/{playerName}/{itemName}")]
+    [HttpPost] [Route("Inventory/Create/{playerName}/{itemName}")]
     public HttpResponseMessage CreateInventorySlot(string playerName, string itemName)
     {
         inventoryDAO = new InventoryDAO();
@@ -22,8 +21,7 @@ public class InventoryController : Controller
             : new HttpResponseMessage(HttpStatusCode.InternalServerError);
     }
 
-    [HttpPut]
-    [Route("Inventory/Update/Quantity/{playerName}/{itemName}/{quantity}")]
+    [HttpPut] [Route("Inventory/Update/Quantity/{playerName}/{itemName}/{quantity}")]
     public HttpResponseMessage UpdateInventoryQuantity(string playerName, string itemName, int quantity)
     {
         inventoryDAO = new InventoryDAO();
@@ -33,8 +31,7 @@ public class InventoryController : Controller
             : new HttpResponseMessage(HttpStatusCode.InternalServerError);
     }
 
-    [HttpGet]
-    [Route("Inventory/Get/Quantity/{playerName}/{itemName}")]
+    [HttpGet] [Route("Inventory/Get/Quantity/{playerName}/{itemName}")]
     public int GetInventoryQuantity(string playerName, string itemName)
     {
         inventoryDAO = new InventoryDAO();
@@ -42,8 +39,7 @@ public class InventoryController : Controller
         return inventoryDAO.GetInventoryQuantity(playerName, itemName);
     }
 
-    [HttpGet]
-    [Route("Inventory/Exists/{playerName}/{itemName}")]
+    [HttpGet] [Route("Inventory/Exists/{playerName}/{itemName}")]
     public bool DoesInventorySlotExist(string playerName, string itemName)
     {
         inventoryDAO = new InventoryDAO();
@@ -51,8 +47,7 @@ public class InventoryController : Controller
         return inventoryDAO.DoesInventorySlotExist(playerName, itemName);
     }
     
-    [HttpGet]
-    [Route("Inventory/Get/All/{playerName}")]
+    [HttpGet] [Route("Inventory/Get/All/{playerName}")]
     public List<Inventory> GetAllInventorySlotsForPlayer(string playerName)
     {
         inventoryDAO = new InventoryDAO();
@@ -60,8 +55,7 @@ public class InventoryController : Controller
         return inventoryDAO.GetAllInventorySlotsForPlayer(playerName);
     }
     
-    [HttpDelete]
-    [Route("Inventory/Delete/Single/{playerName}/{itemName}")]
+    [HttpDelete] [Route("Inventory/Delete/Single/{playerName}/{itemName}")]
     public HttpResponseMessage DeleteInventorySlot(string playerName, string itemName)
     {
         inventoryDAO = new InventoryDAO();
@@ -71,8 +65,7 @@ public class InventoryController : Controller
             : new HttpResponseMessage(HttpStatusCode.InternalServerError);
     }
 
-    [HttpDelete]
-    [Route("Inventory/Delete/Clear/{playerName}")]
+    [HttpDelete] [Route("Inventory/Delete/Clear/{playerName}")]
     public HttpResponseMessage ClearInventoryForPlayer(string playerName)
     {
         inventoryDAO = new InventoryDAO();

@@ -10,8 +10,7 @@ public class AreaController : Controller
 {
     private AreaDAO areaDAO;
 
-    [HttpPost]
-    [Route("Area/Create/{areaName}/{requiredLevel}")]
+    [HttpPost] [Route("Area/Create/{areaName}/{requiredLevel}")]
     public HttpResponseMessage CreateArea(string areaName, int requiredLevel)
     {
         areaDAO = new AreaDAO();
@@ -21,8 +20,7 @@ public class AreaController : Controller
             : new HttpResponseMessage(HttpStatusCode.InternalServerError);
     }
 
-    [HttpPut]
-    [Route("Area/Update/RequiredLevel/{areaName}/{requiredLevel}")]
+    [HttpPut] [Route("Area/Update/RequiredLevel/{areaName}/{requiredLevel}")]
     public HttpResponseMessage UpdateAreaRequiredLevel(string areaName, int requiredLevel)
     {
         areaDAO = new AreaDAO();
@@ -32,8 +30,7 @@ public class AreaController : Controller
             : new HttpResponseMessage(HttpStatusCode.InternalServerError);
     }
 
-    [HttpPut]
-    [Route("Area/Update/AreaName/{areaName}/{newName}")]
+    [HttpPut] [Route("Area/Update/AreaName/{areaName}/{newName}")]
     public HttpResponseMessage UpdateAreaName(string areaName, string newName)
     {
         areaDAO = new AreaDAO();
@@ -43,8 +40,7 @@ public class AreaController : Controller
             : new HttpResponseMessage(HttpStatusCode.InternalServerError);
     }
     
-    [HttpGet]
-    [Route("Area/GetById/{areaId}")]
+    [HttpGet] [Route("Area/GetById/{areaId}")]
     public Area? GetAreaById(int areaId)
     {
         areaDAO = new AreaDAO();
@@ -52,8 +48,7 @@ public class AreaController : Controller
         return areaDAO.GetAreaById(areaId);
     }
     
-    [HttpGet]
-    [Route("Area/GetbyName/{areaName}")]
+    [HttpGet] [Route("Area/GetbyName/{areaName}")]
     public Area? GetAreaByName(string areaName)
     {
         areaDAO = new AreaDAO();
@@ -61,8 +56,7 @@ public class AreaController : Controller
         return areaDAO.GetAreaByName(areaName);
     }
     
-    [HttpGet]
-    [Route("Area/GetAll")]
+    [HttpGet] [Route("Area/GetAll")]
     public List<Area> GetAllAreas()
     {
         areaDAO = new AreaDAO();
@@ -70,8 +64,7 @@ public class AreaController : Controller
         return areaDAO.GetAllAreas();
     }
 
-    [HttpGet]
-    [Route("Area/Exists/{areaName}")]
+    [HttpGet] [Route("Area/Exists/{areaName}")]
     public bool DoesAreaExist(string areaName)
     {
         areaDAO = new AreaDAO();
@@ -79,8 +72,7 @@ public class AreaController : Controller
         return areaDAO.DoesAreaExist(areaName);
     }
 
-    [HttpDelete]
-    [Route("Area/Delete/{areaName}")]
+    [HttpDelete] [Route("Area/Delete/{areaName}")]
     public HttpResponseMessage DeleteArea(string areaName)
     {
         areaDAO = new AreaDAO();
