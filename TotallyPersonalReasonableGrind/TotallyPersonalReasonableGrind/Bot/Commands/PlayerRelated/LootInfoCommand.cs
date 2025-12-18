@@ -33,17 +33,18 @@ public class LootInfoCommand : ICommand
         }
     }
     public ulong Id { get; }
-    
+
+    private void WriteWrongLootMessage(MessageProperties properties)
+    {
+        EmbedBuilder embed = new();
+        embed.WithTitle("error");
+        embed.Description = "Item not found. Please try again with a valid item name.";
+        properties.Embed = embed.Build();
+    }
     public static SocketApplicationCommand BuildProperties()
     {
         SlashCommandOptionBuilder list = new();
         list.WithName("item").WithDescription("Item to get info about").WithType(ApplicationCommandOptionType.String).WithRequired(true);
-        var itemList = ItemAccess.GetAllItems().Result;
-        for (var index = 0; index < itemList.Count; index++)
-        {
-            var lootName = itemList[index];
-            list.AddChoice(lootName.Name, lootName.Name);
-        }
 
         SlashCommandBuilder builder = new();
         builder.WithName("lootinfo").WithDescription("Show info of an item").AddOption(list);
@@ -60,7 +61,19 @@ public class LootInfoCommand : ICommand
     {
         //Get Item Info
         var itemName = command.Data.Options.First().Value;
+        var itemList = ItemAccess.GetAllItems().Result;
+        if (itemList.Any(x => x.Name.ToLower() == ((string)itemName).ToLower()) == false)
+        {
+            command.ModifyOriginalResponseAsync(WriteWrongLootMessage);
+            return Task.FromResult(false);
+        }
+        
         List<Loot> rightLoot = LootAccess.GetLootEntriesByItemName((string)itemName).Result;
+        if (rightLoot.Count == 0)
+        {
+            command.ModifyOriginalResponseAsync(WriteWrongLootMessage);
+            return Task.FromResult(false);
+        }
         LootInfoMessageBuilder builder = new(rightLoot, ItemAccess.GetItemById(rightLoot[0].ItemId).Result);
         
         //Display loot Info

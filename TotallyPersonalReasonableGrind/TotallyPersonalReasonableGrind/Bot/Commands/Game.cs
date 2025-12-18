@@ -48,7 +48,11 @@ public class Game : ICommand
             { "sell_item"       , OnSellItem     },
             { "sell_quantity"   , OnSellQuantity },
             { "confirm_sell"    , OnConfirmSell  },
-            { "back"            , OnSellBack     }
+            { "back"            , OnSellBack     },
+            { "backMove"        , OnMoveBack     },
+            { "backShop"        , OnShopBack     },
+            { "buy_xp"          , OnShopBuyXp    },
+            { "move_to"         , OnMoveChoose   }
         };
     }
     
@@ -117,16 +121,11 @@ public class Game : ICommand
             return ItemAccess.GetItemById(itemId).Result;
         }
         
-        string EmojiString(string emojiName)
-        {
-            return ":" + emojiName + ":";
-        }
-        
         public void WriteLootMessage(MessageProperties properties)
         {
             Item item = GetItemFromLoot(Loot);
             List<EmbedFieldBuilder> fields = new();
-            fields.Add(new EmbedFieldBuilder().WithName("Item").WithValue(Loot.Quantity + " " + item.Name + " " + EmojiString(item.EmojiName)).WithIsInline(true));
+            fields.Add(new EmbedFieldBuilder().WithName("Item").WithValue(Loot.Quantity + " " + item.Name + " " + Item.EmojiFromName(item)).WithIsInline(true));
             
             EmbedBuilder embed = new();
             embed.WithTitle("Game");
@@ -140,7 +139,7 @@ public class Game : ICommand
                 LootRarity.Legendary => Color.Orange,
                 _ => Color.DarkGrey
             });
-            embed.ImageUrl = ImageLinkHelper.GetImageLink("walk");
+            embed.ImageUrl = ImageLinkHelper.GetImageLink(Loot.Type == LootType.Walk ? "walk" : "hit");
 
             embed.Fields = fields;
             
@@ -170,9 +169,10 @@ public class Game : ICommand
             default:
                 throw new InvalidDataException("Invalid loot type.");
         }
+        m_player = PlayerAccess.GetOrCreatePlayer(m_player.Name).Result;
         if (leveledUp)
         {
-            int newLevel = loot.Type == LootType.Walk ? m_player.ExplorationLvl + 1 : m_player.CombatLvl + 1;
+            int newLevel = loot.Type == LootType.Walk ? m_player.ExplorationLvl : m_player.CombatLvl;
             string levelType = loot.Type == LootType.Walk ? "Exploration" : "Combat";
             m_channel.SendMessageAsync("Congratulations " + m_player.Name + ", you leveled up your" + levelType+ " level to " + newLevel + "!");
         }
@@ -248,26 +248,18 @@ public class Game : ICommand
     
     // SELL---------------------------------------------------------------------------------------
 
-    private class SellItemMessageBuilder
+    private class SellItemMessageBuilder(Item item, int quantity)
     {
-        public Item Item { get; set; }
-        public int Quantity { get; set; }
         public bool SaleSuccessful { get; set; }
-
-        public SellItemMessageBuilder(Item item, int quantity)
-        {
-            Item = item;
-            Quantity = quantity;
-        }
         
         public void WriteSellItemMessage(MessageProperties properties)
         {
             EmbedBuilder embed = new();
             embed.WithTitle("Game");
             if (SaleSuccessful)
-                embed.WithDescription("You sold " + Quantity +" "+ Item.Name + "!");
+                embed.WithDescription("You sold " + quantity +" "+ item.Name + "!");
             else
-                embed.WithDescription("You couldn't sell " + Quantity +" "+ Item.Name + "!");
+                embed.WithDescription("You couldn't sell " + quantity +" "+ item.Name + "!");
             embed.WithColor(Color.Gold);
             embed.ImageUrl = ImageLinkHelper.GetImageLink("sell");
             
@@ -306,12 +298,13 @@ public class Game : ICommand
     void AddPlayerGold(int amount)
     {
         PlayerAccess.UpdatePlayerMoney(m_player.Name, amount).Wait();
+        m_player = PlayerAccess.GetOrCreatePlayer(m_player.Name).Result;
     }
     
     bool SellItem(Item item, int quantity, SocketMessageComponent component)
     {
         int sellValue = item.SellValue * quantity;
-        SellItemMessageBuilder sellItemMessageBuilder = new(item, sellValue);
+        SellItemMessageBuilder sellItemMessageBuilder = new(item, quantity);
         
         if (!PlayerHasItem(item, quantity))
         {
@@ -476,17 +469,115 @@ public class Game : ICommand
     }
     
     // SHOP---------------------------------------------------------------------------------------
+
+    private class ShopMessageBuilder(int xpValue, string xpType)
+    {
+        public int moneyValue { get; set; }
+        public bool BuySuccessful { get; set; }
+        
+        public void WriteBuyMessage(MessageProperties properties)
+        {
+            EmbedBuilder embed = new();
+            embed.WithTitle("Game");
+            if (BuySuccessful)
+                embed.WithDescription("You bought " + xpValue +" XP for "+ xpType + "!" + " You have " + moneyValue +" money.");
+            else
+                embed.WithDescription("You don't have enough money to buy " + xpValue +" XP for "+ xpType + "! You have " + moneyValue + " money.");
+            embed.WithColor(Color.Green);
+            embed.ImageUrl = ImageLinkHelper.GetImageLink("shop");
+            
+            properties.Embed = embed.Build();
+        }
+    }
+    
+    private void AddShopSelectMenuValues(SelectMenuBuilder selectMenu, int maxValue, string valueName)
+    {
+        int dividePerEight = (int)MathF.Round(maxValue / 8f);
+        int dividePerFour = (int)MathF.Round(maxValue / 4f);
+        int dividePerTwo = (int)MathF.Round(maxValue / 2f);
+        selectMenu.AddOption($"{dividePerEight} {valueName} XP - {dividePerEight} money", $"{dividePerEight}|{valueName}");
+        selectMenu.AddOption($"{dividePerFour} {valueName} XP - {dividePerFour} money", $"{dividePerFour}|{valueName}");
+        selectMenu.AddOption($"{dividePerTwo} {valueName} XP - {dividePerTwo} money", $"{dividePerTwo}|{valueName}");
+        selectMenu.AddOption($"{maxValue} {valueName} XP - {maxValue} money", $"{maxValue}|{valueName}");
+    }
+    private MessageComponent GetShopComponents()
+    {
+        ComponentBuilder builder = new ComponentBuilder();
+        
+        SelectMenuBuilder selectMenuBuilder = new();
+        selectMenuBuilder.WithCustomId(Id + "|buy_xp")
+            .WithPlaceholder("Select an amount of xp")
+            .WithType(ComponentType.SelectMenu);
+        
+        int combatXp = PlayerAccess.GetNextExpRequiredForNextLevel(m_player.Name, "Combat").Result;
+        int explorationXp = PlayerAccess.GetNextExpRequiredForNextLevel(m_player.Name, "Exploration").Result;
+        AddShopSelectMenuValues(selectMenuBuilder,combatXp, "Combat");
+        AddShopSelectMenuValues(selectMenuBuilder,explorationXp, "Exploration");
+        
+        ButtonBuilder backButtonBuilder = new();
+        backButtonBuilder.WithLabel("Back")
+            .WithCustomId(Id + "|backShop")
+            .WithStyle(ButtonStyle.Secondary);
+        
+        builder.WithSelectMenu(selectMenuBuilder)
+            .WithButton(backButtonBuilder);
+        
+        return builder.Build();
+    }
     
     private void WriteShopMessage(MessageProperties properties)
     {
         EmbedBuilder embed = new();
         embed.WithTitle("Game");
-        embed.WithDescription("Welcome to the shop!");
+        embed.WithDescription("Welcome to the shop! You have " + m_player.Money + " money.");
         embed.WithColor(Color.Green);
         embed.ImageUrl = ImageLinkHelper.GetImageLink("shop");
             
         properties.Embed = embed.Build();
-        properties.Components = Components;
+        properties.Components = GetShopComponents();
+    }
+    
+    private bool OnShopBack(SocketMessageComponent component)
+    {
+        RestInteractionMessage msg = component.GetOriginalResponseAsync().Result;
+        msg.ModifyAsync(WriteInitialMessage).Wait();
+        return true;
+    }
+
+    private bool OnShopBuyXp(SocketMessageComponent component)
+    {
+        
+        string[] values = component.Data.Values.First().Split('|');
+        m_player = PlayerAccess.GetOrCreatePlayer(m_player.Name).Result;
+        Int32.TryParse(values[0], out int expGained);
+        
+        ShopMessageBuilder shopMessageBuilder = new(expGained, values[1]);
+        
+        if (expGained > m_player.Money)
+        {
+            shopMessageBuilder.BuySuccessful = false;
+            shopMessageBuilder.moneyValue = m_player.Money;
+        }
+        else
+        {
+            shopMessageBuilder.BuySuccessful = true;
+            shopMessageBuilder.moneyValue = m_player.Money - expGained;
+
+            PlayerAccess.UpdatePlayerMoney(m_player.Name, -expGained).Wait();
+            switch (values[1]) {
+                case "Combat":
+                    PlayerAccess.UpdatePlayerCombatStats(m_player.Name, expGained).Wait();
+                    break;
+                case "Exploration":
+                    PlayerAccess.UpdatePlayerExplorationStats(m_player.Name, expGained).Wait();
+                    break;
+                default:
+                    throw new InvalidDataException("Invalid shop type.");
+            }
+        }
+        RestInteractionMessage msg = component.GetOriginalResponseAsync().Result;
+        msg.ModifyAsync(shopMessageBuilder.WriteBuyMessage).Wait();
+        return true;
     }
     
     private bool OnShop(SocketMessageComponent component)
@@ -497,10 +588,23 @@ public class Game : ICommand
     }
     
     // MOVE---------------------------------------------------------------------------------------
+    private class AreaMoveMessageBuilder(Area area)
+    {
+        public void WriteMoveMessage(MessageProperties properties)
+        {
+            EmbedBuilder embed = new();
+            embed.WithTitle("Game");
+            embed.WithDescription("You moved to " + area.Name + " !");
+            embed.WithColor(Color.Red);
+            embed.ImageUrl = ImageLinkHelper.GetImageLink("move");
+            
+            properties.Embed = embed.Build();
+        }
+    }
     Area[] GetAreas()
     {
         List<Area> areas = AreaAccess.GetAllAreas().Result;
-        return areas.Where(x => x.RequiredLvl <= PlayerAccess.GetPlayerMeanLevel(m_player.Name).Result).ToArray();
+        return areas.Where(x => x.RequiredLvl <= PlayerAccess.GetPlayerMeanLevel(m_player.Name).Result && x.Id != m_player.AreaId).ToArray();
     }
 
     private MessageComponent GetMoveComponents(Area[] areas)
@@ -531,10 +635,21 @@ public class Game : ICommand
     private void WriteMoveMessage(MessageProperties properties)
     {
         Area[] areas = GetAreas();
-        
+        if (areas.Length == 0)
+        {
+            EmbedBuilder wrongEmbed = new();
+            wrongEmbed.WithTitle("Game");
+            wrongEmbed.WithDescription("You can't move anywhere!");
+            wrongEmbed.WithColor(Color.Red);
+            wrongEmbed.ImageUrl = ImageLinkHelper.GetImageLink("move");
+            
+            properties.Embed = wrongEmbed.Build();
+            properties.Components = Components;
+            return;
+        }
         EmbedBuilder embed = new();
         embed.WithTitle("Game");
-        embed.WithDescription("You moved to a new location!");
+        embed.WithDescription("You are currently in " + AreaAccess.GetAreaById(m_player.AreaId).Result.Name + " !");
         embed.WithColor(Color.Red);
         embed.ImageUrl = ImageLinkHelper.GetImageLink("move");
         
@@ -546,6 +661,26 @@ public class Game : ICommand
     {
         RestInteractionMessage msg = component.GetOriginalResponseAsync().Result;
         msg.ModifyAsync(WriteMoveMessage).Wait();
+        return true;
+    }
+
+    private bool OnMoveChoose(SocketMessageComponent component)
+    {
+        var areaName = component.Data.Values.First();
+        PlayerAccess.UpdatePlayerAreaByName(m_player.Name, areaName).Wait();
+        m_player = PlayerAccess.GetOrCreatePlayer(m_player.Name).Result;
+        
+        AreaMoveMessageBuilder moveMessageBuilder = new(AreaAccess.GetAreaByName(areaName).Result);
+        
+        RestInteractionMessage msg = component.GetOriginalResponseAsync().Result;
+        msg.ModifyAsync(moveMessageBuilder.WriteMoveMessage).Wait();
+        return true;
+    }
+    
+    private bool OnMoveBack(SocketMessageComponent component)
+    {
+        RestInteractionMessage msg = component.GetOriginalResponseAsync().Result;
+        msg.ModifyAsync(WriteInitialMessage).Wait();
         return true;
     }
     
