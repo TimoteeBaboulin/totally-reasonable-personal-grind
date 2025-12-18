@@ -499,11 +499,39 @@ public class Game : ICommand
     // MOVE---------------------------------------------------------------------------------------
     Area[] GetAreas()
     {
-        throw new NotImplementedException();
+        List<Area> areas = AreaAccess.GetAllAreas().Result;
+        return areas.Where(x => x.RequiredLvl <= PlayerAccess.GetPlayerMeanLevel(m_player.Name).Result).ToArray();
+    }
+
+    private MessageComponent GetMoveComponents(Area[] areas)
+    {
+        ComponentBuilder builder = new ComponentBuilder();
+        
+        SelectMenuBuilder selectMenuBuilder = new();
+        selectMenuBuilder.WithCustomId(Id + "|move_to")
+            .WithPlaceholder("Select a location to move")
+            .WithType(ComponentType.SelectMenu);
+        
+        foreach (var area in areas)
+        {
+            selectMenuBuilder.AddOption(area.Name, area.Name);
+        }
+        
+        ButtonBuilder backButtonBuilder = new();
+        backButtonBuilder.WithLabel("Back")
+            .WithCustomId(Id + "|backMove")
+            .WithStyle(ButtonStyle.Secondary);
+        
+        builder.WithSelectMenu(selectMenuBuilder)
+            .WithButton(backButtonBuilder);
+        
+        return builder.Build();
     }
     
     private void WriteMoveMessage(MessageProperties properties)
     {
+        Area[] areas = GetAreas();
+        
         EmbedBuilder embed = new();
         embed.WithTitle("Game");
         embed.WithDescription("You moved to a new location!");
@@ -511,7 +539,7 @@ public class Game : ICommand
         embed.ImageUrl = ImageLinkHelper.GetImageLink("move");
         
         properties.Embed = embed.Build();
-        properties.Components = Components;
+        properties.Components = GetMoveComponents(areas);
     }
     
     private bool OnMove(SocketMessageComponent component)
