@@ -133,4 +133,28 @@ public class PlayerAccess
             _ => throw new Exception("Invalid stat type.")
         };
     }
+
+    public static async Task UpdatePlayerAreaById(string playerName, int areaId)
+    {
+        Player? player = await GetOrCreatePlayer(playerName);
+        if (player == null)
+        {
+            throw new Exception("Player not found.");
+        }
+        player.AreaId = areaId;
+        await HttpClient.Client.SendToWebServiceAsync($"Player/Update/Area/ById/{playerName}/{player.AreaId}", HttpVerb.PUT, null);
+    }
+    
+    public static async Task UpdatePlayerAreaByName(string playerName, string areaName)
+    {
+        Player? player = await GetOrCreatePlayer(playerName);
+        if (player == null)
+        {
+            throw new Exception("Player not found.");
+        }
+        // Assuming AreaDAO.GetAreaIdFromName is a method that retrieves area ID from area name
+        Area area = await AreaAccess.GetAreaByName(areaName);
+        player.AreaId = area.Id;
+        await HttpClient.Client.SendToWebServiceAsync($"Player/Update/Area/ByName/{playerName}/{areaName}", HttpVerb.PUT, null);
+    }
 }

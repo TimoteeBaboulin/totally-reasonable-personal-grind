@@ -16,6 +16,17 @@ public class AreaAccess
         return area;
     }
 
+    public static async Task<Area> GetAreaByName(string areaName)
+    {
+        string areaData = await HttpClient.Client.SendToWebServiceAsync($"Area/GetByName/{areaName}", HttpVerb.GET, null);
+        Area? area = Area.FromJson(areaData);
+        if (area == null)
+        {
+            throw new Exception($"Area with name {areaName} not found.");
+        }
+        return area;
+    }
+
     public static async Task<List<Area>> GetAllAreas()
     {
         string areasData = await HttpClient.Client.SendToWebServiceAsync($"Area/GetAll", HttpVerb.GET, null);
