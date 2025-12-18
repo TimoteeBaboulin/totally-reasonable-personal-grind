@@ -48,6 +48,7 @@ public class Game : ICommand
             { "sell_item"       , OnSellItem     },
             { "sell_quantity"   , OnSellQuantity },
             { "confirm_sell"    , OnConfirmSell  },
+            { "sell_all"        , OnSellAll      },
             { "back"            , OnSellBack     },
             { "backMove"        , OnMoveBack     },
             { "backShop"        , OnShopBack     },
@@ -248,7 +249,7 @@ public class Game : ICommand
     
     // SELL---------------------------------------------------------------------------------------
 
-    private class SellItemMessageBuilder(Item item, int quantity)
+    private class SellItemMessageBuilder(string itemName, int quantity, int sellValue)
     {
         public bool SaleSuccessful { get; set; }
         
@@ -257,9 +258,9 @@ public class Game : ICommand
             EmbedBuilder embed = new();
             embed.WithTitle("Game");
             if (SaleSuccessful)
-                embed.WithDescription("You sold " + quantity +" "+ item.Name + "!");
+                embed.WithDescription("You sold " + quantity +" "+ itemName + " for "+ sellValue +" money!");
             else
-                embed.WithDescription("You couldn't sell " + quantity +" "+ item.Name + "!");
+                embed.WithDescription("You couldn't sell " + quantity +" "+ itemName + "!");
             embed.WithColor(Color.Gold);
             embed.ImageUrl = ImageLinkHelper.GetImageLink("sell");
             
@@ -304,7 +305,7 @@ public class Game : ICommand
     bool SellItem(Item item, int quantity, SocketMessageComponent component)
     {
         int sellValue = item.SellValue * quantity;
-        SellItemMessageBuilder sellItemMessageBuilder = new(item, quantity);
+        SellItemMessageBuilder sellItemMessageBuilder = new(item.Name, quantity, sellValue);
         
         if (!PlayerHasItem(item, quantity))
         {
@@ -354,13 +355,19 @@ public class Game : ICommand
             .WithCustomId(Id + "|confirm_sell")
             .WithStyle(ButtonStyle.Danger);
         
+        ButtonBuilder sellAllBuilder = new();
+        sellAllBuilder.WithLabel("Sell All Item")
+            .WithCustomId(Id + "|sell_all")
+            .WithStyle(ButtonStyle.Danger);
+        
         ButtonBuilder backButtonBuilder = new();
         backButtonBuilder.WithLabel("Back")
             .WithCustomId(Id + "|back")
             .WithStyle(ButtonStyle.Secondary);
-        
+
         builder.WithSelectMenu(selectMenuBuilder)
             .WithButton(buttonBuilder)
+            .WithButton(sellAllBuilder)
             .WithButton(backButtonBuilder);
         
         if (false)
@@ -385,6 +392,17 @@ public class Game : ICommand
     private void WriteInitalSellMessage(MessageProperties properties)
     {
         Inventory[] inventories = GetPlayerInventory();
+        if (inventories.Length == 0)
+        {
+            EmbedBuilder wrongEmbed = new();
+            wrongEmbed.WithTitle("Game");
+            wrongEmbed.WithDescription("You don't have any items to sell!");
+            wrongEmbed.WithColor(Color.Gold);
+            wrongEmbed.ImageUrl = ImageLinkHelper.GetImageLink("sell");
+            
+            properties.Embed = wrongEmbed.Build();
+            return;
+        }
         
         EmbedBuilder embed = new();
         embed.WithTitle("Game");
@@ -445,6 +463,31 @@ public class Game : ICommand
         }
         
         component.RespondAsync("You don't have that item.").Wait();
+        return true;
+    }
+
+    private bool OnSellAll(SocketMessageComponent component)
+    {
+
+        RestInteractionMessage msg = component.GetOriginalResponseAsync().Result;
+        Inventory[] inventories = GetPlayerInventory();
+
+        int resultQuantity = 0;
+        int resultMoney = 0;
+        foreach (var inventory in inventories)
+        {
+            Item item = ItemAccess.GetItemById(inventory.ItemId).Result;
+            
+            resultQuantity += inventory.Quantity;
+            resultMoney += item.SellValue * inventory.Quantity;
+            
+            AddPlayerGold(item.SellValue * inventory.Quantity);
+            RemovePlayerItem(item, inventory.Quantity);
+        }
+        
+        SellItemMessageBuilder sellItemMessageBuilder = new("items", resultQuantity, resultMoney);
+        sellItemMessageBuilder.SaleSuccessful = true;
+        msg.ModifyAsync(sellItemMessageBuilder.WriteSellItemMessage).Wait();
         return true;
     }
     
@@ -553,6 +596,7 @@ public class Game : ICommand
         
         ShopMessageBuilder shopMessageBuilder = new(expGained, values[1]);
         
+        bool leveledUp = false;
         if (expGained > m_player.Money)
         {
             shopMessageBuilder.BuySuccessful = false;
@@ -563,13 +607,14 @@ public class Game : ICommand
             shopMessageBuilder.BuySuccessful = true;
             shopMessageBuilder.moneyValue = m_player.Money - expGained;
 
+            
             PlayerAccess.UpdatePlayerMoney(m_player.Name, -expGained).Wait();
             switch (values[1]) {
                 case "Combat":
-                    PlayerAccess.UpdatePlayerCombatStats(m_player.Name, expGained).Wait();
+                    leveledUp = PlayerAccess.UpdatePlayerCombatStats(m_player.Name, expGained).Result;
                     break;
                 case "Exploration":
-                    PlayerAccess.UpdatePlayerExplorationStats(m_player.Name, expGained).Wait();
+                    leveledUp = PlayerAccess.UpdatePlayerExplorationStats(m_player.Name, expGained).Result;
                     break;
                 default:
                     throw new InvalidDataException("Invalid shop type.");
@@ -577,11 +622,20 @@ public class Game : ICommand
         }
         RestInteractionMessage msg = component.GetOriginalResponseAsync().Result;
         msg.ModifyAsync(shopMessageBuilder.WriteBuyMessage).Wait();
+
+        if (leveledUp) {
+            m_player = PlayerAccess.GetOrCreatePlayer(m_player.Name).Result;
+            int newLevel = values[1] == "Exploration" ? m_player.ExplorationLvl : m_player.CombatLvl;
+            string levelType = values[1] == "Exploration" ? "Exploration" : "Combat";
+            m_channel.SendMessageAsync("Congratulations " + m_player.Name + ", you leveled up your " + levelType+ " level to " + newLevel + "!");
+        }
         return true;
     }
     
     private bool OnShop(SocketMessageComponent component)
     {
+        m_player = PlayerAccess.GetOrCreatePlayer(m_player.Name).Result;
+        
         RestInteractionMessage msg = component.GetOriginalResponseAsync().Result;
         msg.ModifyAsync(WriteShopMessage).Wait();
         return true;
